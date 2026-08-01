@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live route map — Top of the South, January 2027</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root{
+    --paper:#EDEFE8;--paper-2:#F7F8F3;--ink:#1B2420;--ink-soft:#4E5B54;--ink-faint:#7B877F;
+    --bush:#2E5A3C;--water:#14607C;--water-pale:#D3E3EA;--contour:#A9683A;--rule:#C6CBBD;
+    --display:"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed",Helvetica,Arial,sans-serif;
+    --body:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+  .sheet{max-width:1180px;margin:0 auto;padding:44px 24px 72px}
+  .eyebrow{font-family:var(--display);text-transform:uppercase;letter-spacing:.22em;font-size:12px;color:var(--contour);margin:0 0 12px}
+  h1{font-family:var(--display);font-size:clamp(34px,6vw,54px);line-height:.96;font-weight:700;margin:0 0 12px;text-transform:uppercase}
+  h1 span{color:var(--water)}
+  .dek{max-width:42em;font-size:17px;color:var(--ink-soft);margin:0 0 24px}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);gap:24px;align-items:start}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  #map{height:660px;border:1px solid var(--rule);background:var(--paper-2)}
+  @media(max-width:900px){#map{height:440px}}
+
+  .side{max-height:660px;overflow-y:auto;border:1px solid var(--rule);background:var(--paper-2)}
+  @media(max-width:900px){.side{max-height:none}}
+  .grp{padding:14px 16px 6px;border-bottom:1px solid var(--rule)}
+  .grp h2{font-family:var(--display);text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--contour);margin:0 0 2px}
+  .grp p{margin:0 0 10px;font-size:13px;color:var(--ink-faint)}
+  .row{width:100%;text-align:left;background:none;border:none;border-left:3px solid transparent;padding:9px 16px;cursor:pointer;font-family:var(--body);display:block}
+  .row:hover{background:#fff}
+  .row.on{background:#fff;border-left-color:var(--contour)}
+  .row:focus-visible{outline:2px solid var(--water);outline-offset:-2px}
+  .row .nm{font-family:var(--display);text-transform:uppercase;letter-spacing:.04em;font-size:14px;font-weight:700;display:block}
+  .row .mt{font-size:12px;color:var(--ink-faint);display:block}
+  .row .sw{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+
+  .leaflet-popup-content-wrapper{border-radius:0;background:var(--paper-2);box-shadow:0 2px 12px rgba(0,0,0,.18)}
+  .leaflet-popup-content{margin:14px 16px;font-family:var(--body);font-size:14px;line-height:1.5;width:250px!important}
+  .pop-t{font-family:var(--display);text-transform:uppercase;letter-spacing:.03em;font-size:16px;font-weight:700;margin:0 0 3px}
+  .pop-d{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--contour);margin:0 0 8px}
+  .pop-w{border-left:3px solid var(--water);background:var(--water-pale);padding:8px 10px;margin:0 0 9px;font-style:italic;color:var(--water);font-size:13px;line-height:1.45}
+  .pop-w.dry{border-left-color:var(--ink-faint);background:#E4E7DF;color:var(--ink-soft)}
+  .pop-n{margin:0 0 9px;color:var(--ink-soft);font-size:13.5px}
+  .pop-m{margin:0 0 9px;font-size:12px;color:var(--ink-faint);border-top:1px solid var(--rule);padding-top:8px}
+  .pop-a{display:inline-block;font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:10px;border:1px solid var(--water);color:var(--water);padding:5px 9px;text-decoration:none;margin-right:6px}
+  .pop-a:hover{background:var(--water);color:#fff}
+
+  .marker-dot{border-radius:50%;border:2.5px solid #F7F8F3;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .marker-wp{border-radius:50%;background:#F7F8F3;border:1.5px solid #7B877F}
+
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;font-size:13px;color:var(--ink-faint)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .legend i.line{width:20px;height:0;border-radius:0;border-top:2.5px solid var(--contour)}
+  .legend i.dash{width:20px;height:0;border-radius:0;border-top:2px dashed var(--contour)}
+
+  footer{margin-top:40px;padding-top:18px;border-top:2px solid var(--ink);font-size:13px;color:var(--ink-faint)}
+  footer a{color:var(--water)}
+
+  h2.lh{font-family:var(--display);text-transform:uppercase;letter-spacing:.16em;font-size:13px;font-weight:700;color:var(--bush);margin:46px 0 10px;padding-bottom:9px;border-bottom:1.5px solid var(--bush)}
+  .status{font-size:13px;margin:0 0 14px;font-style:italic;color:var(--ink-faint)}
+  .status.good{color:var(--bush);font-style:normal}
+  .status.part{color:var(--contour)}
+  .status.bad{color:#9A3B2A}
+  table.legs{width:100%;border-collapse:collapse;font-size:15px;margin:0 0 12px}
+  table.legs th{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--ink-faint);text-align:left;padding:0 12px 7px 0;border-bottom:1.5px solid var(--ink);font-weight:700}
+  table.legs td{padding:10px 12px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+  table.legs .num,table.legs th.num{text-align:right;padding-right:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+  table.legs .lday{display:block;font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:10px;color:var(--contour);margin-top:2px}
+  table.legs .live{color:var(--water);font-weight:700}
+  .fine{font-size:13px;color:var(--ink-faint);margin:0}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <p class="eyebrow">Top of the South · 9–23 January 2027 · 1,510 km</p>
+  <h1>Live <span>Route Map</span></h1>
+  <p class="dek">Pan, zoom and tap any pin. Overnight stops are in blue where there's a pool or safe swimming, grey where there isn't. Hollow pins are day stops. Every pin has a one-tap link into Google Maps for directions, photos and current hours.</p>
+
+  <div class="layout">
+    <div id="map" role="application" aria-label="Interactive map of the January 2027 South Island route"></div>
+    <div class="side" id="side"></div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:#14607C"></i>Overnight · pool or safe swimming</span>
+    <span><i style="background:#7B877F"></i>Overnight · no swimming</span>
+    <span><i style="background:#F7F8F3;border:1.5px solid #7B877F"></i>Day stop</span>
+    <span><i class="line"></i>Driving route</span>
+    <span><i class="dash"></i>Day trip and return to airport</span>
+  </div>
+
+  <h2 class="lh">Drive legs</h2>
+  <p class="status" id="routeStatus">Loading road routes…</p>
+  <table class="legs">
+    <thead><tr><th>Leg</th><th class="num">My estimate</th><th class="num">Routed</th></tr></thead>
+    <tbody id="legBody"></tbody>
+  </table>
+  <p class="fine">Routed figures come from OpenStreetMap road data and assume free-flowing traffic in a car. A 5.5 m campervan on the Buller Gorge, Arthur's Pass or the Summit Road into Akaroa will be slower than the routed time, and none of these figures include stops. Treat the routed distance as accurate and the routed time as a floor.</p>
+
+  <footer>
+    <p>Needs an internet connection — map tiles load from a server. Keep the offline SVG version for the Buller Gorge and Arthur's Pass, where coverage drops out. Place details, phone numbers and opening hours from Google Places, checked 01/08/2026. Drive times are estimates, not routed figures.</p>
+    <p>Tiles © <a href="https://carto.com/attributions">CARTO</a>, data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.</p>
+  </footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const S = [
+  {g:"9–10 Jan · Hanmer Springs", gd:"Collect the van at 2pm, drive 1h45 north. Two nights.", items:[
+    {n:"Hanmer Springs TOP 10 Holiday Park", d:"Sat 9 – Sun 10 Jan · base", ll:[-42.5281508,172.8299593], k:"stay", swim:false,
+     w:"No pool, but private wood-fired hot tubs at about $39 an hour. Book one for the first evening.",
+     note:"Jumping pillow, trampoline, playground and pedal karts. Walkable to the village, so leave the van parked for two days.",
+     meta:"03 315 7113 · reception 8:30am–6pm · 4.5 (1,169)", cid:"1467217169020036983", url:"https://www.hanmerspringstop10.co.nz/"},
+    {n:"Hanmer Springs Thermal Pools", d:"Sun 10 Jan · morning", ll:[-42.5225719,172.829057], k:"day", swim:true,
+     w:"SWIMMING — waterslides, lazy river and hot pools at varying temperatures, a 400 m walk from camp.",
+     note:"Outside food allowed in. Go at opening; queues build through the morning in January.",
+     meta:"0800 442 663 · 10am–7pm daily · 4.6 (10,140)", cid:"13711202142637443091", url:"https://hanmersprings.co.nz/"}
+  ]},
+  {g:"11–12 Jan · Kaikōura", gd:"Inland Road via Waiau, 1h45. Whale Watch on the Monday.", items:[
+    {n:"Kaikoura TOP 10 Holiday Park", d:"Mon 11 – Tue 12 Jan · base", ll:[-42.3962455,173.6799833], k:"stay", swim:true,
+     w:"SWIMMING — pool on site, and this is where you swim. Local beaches are gravel and exposed, sea around 15°C.",
+     note:"Short walk to the Whale Watch departure point. Book the 7:15am sailing for the calmest seas and two same-day fallbacks.",
+     meta:"03 319 5362 · reception 8am–8:30pm · 4.5 (1,325)", cid:"10681145335949620542", url:"https://hampshireholidayparks.co.nz/park/kaikoura-top10-holiday-park/"},
+    {n:"Point Kean Viewpoint", d:"Mon 11 Jan · morning", ll:[-42.4235335,173.7162471], k:"day", swim:false,
+     w:"No swimming. Rock pools and gravel shore.",
+     note:"Free fur seal colony with pups in January. Follow with the Peninsula Walkway. Keep 20 m back, never get between a seal and the water. Sandflies.",
+     meta:"Open 24 hours · 4.7 (1,318)", cid:"2633039842644795338", url:""}
+  ]},
+  {g:"13–15 Jan · Motueka", gd:"The long leg at 4h45. Break it at Pelorus Bridge.", items:[
+    {n:"Pelorus Bridge Scenic Reserve", d:"Wed 13 Jan · lunch stop", ll:[-41.2988516,173.5726899], k:"day", swim:true,
+     w:"SWIMMING — clear, safe river water with a suspension bridge and a café.",
+     note:"Car park fills by 10:30 on a hot day, so a late lunch stop works in your favour.",
+     meta:"03 530 3002 · open 24 hours · 4.7 (1,520)", cid:"2596978224990731369", url:"https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/pelorus-bridge-scenic-reserve/"},
+    {n:"Motueka TOP 10 Holiday Park", d:"Wed 13 – Fri 15 Jan · base", ll:[-41.1044435,173.0135246], k:"stay", swim:true,
+     w:"SWIMMING — pool on site plus a private spa included free with TOP 10 membership.",
+     note:"Playground and loaner bikes. Winery lunch in Upper Moutere on the 15th — decision still open between Moutere Hills, Neudorf and Kahurangi.",
+     meta:"0800 668 835 · reception 8:30am–7pm · 4.4 (646)", cid:"18255429896721573117", url:"https://www.motuekatop10.co.nz/"},
+    {n:"Kaiteriteri Beach", d:"Thu 14 Jan · all day", ll:[-41.0368257,173.0177583], k:"day", swim:true,
+     w:"SWIMMING — the best of the whole trip. Golden sand, calm water, tidal lagoon, sea near 19°C.",
+     note:"Wilsons water taxis to Anchorage leave from here: out 10:30, back 4:15. Car park full by 10am in January.",
+     meta:"4.8 (124)", cid:"5561908485755573551", url:"https://www.abeltasman.co.nz/water-taxi/"}
+  ]},
+  {g:"16–17 Jan · Carters Beach", gd:"Over the Hope Saddle and down the Buller Gorge, 3h15.", items:[
+    {n:"Carters Beach TOP 10 Holiday Park", d:"Sat 16 – Sun 17 Jan · base", ll:[-41.7496687,171.5549312], k:"stay", swim:true,
+     w:"SWIMMING — no pool, but a safe sandy beach 100 m from the front gate. The only genuinely swimmable West Coast beach on your route.",
+     note:"Hot tubs for hire, jumping pillow, games room. Ask for hardstanding; the grass turns to mud in West Coast rain.",
+     meta:"03 789 8002 · reception 9am–7pm · 4.5 (617)", cid:"10791166957721398876", url:"https://hampshireholidayparks.co.nz/park/carters-beach-top10-holiday-park/"},
+    {n:"Cape Foulwind Seal Colony", d:"Sun 17 Jan · morning", ll:[-41.7700216,171.4611791], k:"day", swim:false,
+     w:"No swimming. Exposed rocky headland.",
+     note:"Free viewing platform 15 minutes from camp. Clifftop track through to Tauranga Bay and back is about 90 minutes with stops.",
+     meta:"Pin is the access road; the platform is at its western end", cid:"9471317964177092281", url:""}
+  ]},
+  {g:"18–19 Jan · Greymouth", gd:"Only 1h30 of driving on the 18th. The 19th is a day trip south.", items:[
+    {n:"Pancake Rocks and Blowholes", d:"Mon 18 Jan · late morning", ll:[-42.1154026,171.3296564], k:"day", swim:false,
+     w:"No swimming. Cliff-edge boardwalk above open sea.",
+     note:"Twenty-minute loop. The blowholes only perform near high tide with a decent swell — check the tide chart the night before. Parking free 20 min, then $5/hr.",
+     meta:"Open 24 hours · 4.8 (2,057)", cid:"1743533999881709716", url:"https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/"},
+    {n:"Shantytown Heritage Park", d:"Mon 18 Jan · afternoon", ll:[-42.533791,171.1824342], k:"day", swim:false,
+     w:"No swimming.",
+     note:"The best fit on the whole route for her: working steam train, sawmill, sluice gun and gold panning at roughly $7–10 a pan. Open 10am to 3pm only — start at 10.",
+     meta:"03 762 6634 · 10am–3pm daily · 4.3 (1,657)", cid:"17986278334682525179", url:"https://www.shantytown.co.nz/"},
+    {n:"Greymouth Seaside TOP 10 Holiday Park", d:"Mon 18 – Tue 19 Jan · base", ll:[-42.4673293,171.187748], k:"stay", swim:false,
+     w:"NO SWIMMING — the one dry stop. Beach has rips and driftwood, no pool at the park. Grey District Aquatic Centre is 10 minutes away.",
+     note:"Private spa pool for hire, mini golf, go-karts, playground and a games room.",
+     meta:"03 768 6618 · reception 8:30am–7pm · 4.5 (945)", cid:"12511272626244471117", url:"http://www.top10greymouth.co.nz/"},
+    {n:"Hokitika Gorge", d:"Tue 19 Jan · day trip", ll:[-42.9555817,171.0167084], k:"day", swim:false,
+     w:"Not for swimming — fast, cold, deep water below the bridges.",
+     note:"Turquoise water and two swing bridges on a 2.4 km easy loop. Colour only shows after dry weather. Pair with a pounamu carving session in Hokitika and the free glow worm dell at dusk. Sandflies — repellent before you leave the van.",
+     meta:"03 755 6166 · open 24 hours · 4.8 (4,557)", cid:"1796484060722817152", url:"https://westcoast.co.nz/visit/plan-your-trip/hokitika-gorge/"}
+  ]},
+  {g:"20–22 Jan · Akaroa", gd:"Over Arthur's Pass, 4h45. Three nights so the dolphin swim has a spare day.", items:[
+    {n:"Arthur's Pass Village", d:"Wed 20 Jan · lunch stop", ll:[-42.9401564,171.5619826], k:"day", swim:false,
+     w:"No swimming. Alpine village at 740 m.",
+     note:"Devils Punchbowl Falls walk if legs allow. Kea will strip the rubber from your van's window seals — don't leave it unattended with food visible.",
+     meta:"Village services are limited; fuel at Otira or Springfield", cid:"13024209877352170775", url:""},
+    {n:"Akaroa TOP 10 Holiday Park", d:"Wed 20 – Fri 22 Jan · base", ll:[-43.7965497,172.9710759], k:"stay", swim:true,
+     w:"SWIMMING — decent pool on site, and Akaroa's main beach is sheltered harbour water at around 18°C. Ōkains Bay 35 min for proper sand.",
+     note:"Latest reception on the route, so a late arrival after the long drive is fine. Ask for hardstanding for the harbour view; the walk back up from town is steep.",
+     meta:"03 304 7471 · reception 8:30am–8:30pm · 4.5 (1,148)", cid:"4316972781646861727", url:"http://www.akaroatop10.co.nz/"},
+    {n:"Black Cat Cruises", d:"Thu 21 Jan · morning", ll:[-43.808712,172.9628845], k:"day", swim:true,
+     w:"SWIMMING — Hector's dolphin swim in sheltered harbour water, 5mm wetsuits and hot showers afterwards.",
+     note:"Maximum 12 swimmers, minimum age 8. Adult $250, child 8–15 $220, spectator $180. Thursday the 22nd is held clear as your weather fallback.",
+     meta:"03 304 7641 · 9am–5pm · 4.7 (1,361)", cid:"5177962898306884718", url:"http://www.blackcat.co.nz/"}
+  ]},
+  {g:"23 Jan · Departure", gd:"Leave Akaroa by 07:30. Van back by 10am.", items:[
+    {n:"Christchurch Airport", d:"Sat 23 Jan · 9:15am", ll:[-43.48763,172.5374026], k:"day", swim:false,
+     w:"No swimming.",
+     note:"1h45 from Akaroa. Fill up at Little River or Lincoln, not Akaroa where it's dearer. Be at the depot 45 minutes before the 10am deadline.",
+     meta:"03 353 7777 · open 24 hours · 4.4 (5,340)", cid:"1081127275368919424", url:"https://www.christchurchairport.co.nz/en/"}
+  ]}
+];
+
+/* Legs. `via` forces the correct highway where more than one route exists.
+   `fb` is the hand-drawn fallback if the routing service is unreachable. */
+const LEGS = [
+ {id:"l1", name:"Christchurch Airport → Hanmer Springs", day:"Sat 9 Jan",
+  via:[[-43.4876,172.5374],[-43.0561,172.7522],[-42.5282,172.8300]], dash:false, est:"135 km · 1h45",
+  fb:[[-43.4876,172.5374],[-43.44,172.60],[-43.30,172.70],[-43.05,172.75],[-42.95,172.75],[-42.80,172.83],[-42.65,172.83],[-42.528,172.830]]},
+
+ {id:"l2", name:"Hanmer Springs → Kaikōura", day:"Mon 11 Jan",
+  via:[[-42.5282,172.8300],[-42.6486,173.0483],[-42.3962,173.6800]], dash:false, est:"130 km · 1h45",
+  fb:[[-42.528,172.830],[-42.62,172.98],[-42.65,173.10],[-42.55,173.30],[-42.45,173.50],[-42.396,173.680]]},
+
+ {id:"l3", name:"Kaikōura → Motueka", day:"Wed 13 Jan",
+  via:[[-42.3962,173.6800],[-41.5134,173.9612],[-41.2989,173.5727],[-41.1044,173.0135]], dash:false, est:"370 km · 4h45",
+  fb:[[-42.396,173.680],[-42.20,173.90],[-41.99,174.02],[-41.75,174.10],[-41.52,173.96],[-41.42,173.80],[-41.299,173.573],[-41.28,173.42],[-41.27,173.28],[-41.22,173.10],[-41.104,173.014]]},
+
+ {id:"l4", name:"Motueka → Carters Beach", day:"Sat 16 Jan",
+  via:[[-41.1044,173.0135],[-41.8047,172.3272],[-41.7497,171.5549]], dash:false, est:"245 km · 3h15",
+  fb:[[-41.104,173.014],[-41.25,173.02],[-41.40,173.05],[-41.55,172.75],[-41.65,172.55],[-41.80,172.33],[-41.87,171.95],[-41.80,171.75],[-41.75,171.60],[-41.750,171.555]]},
+
+ {id:"l5", name:"Carters Beach → Greymouth", day:"Mon 18 Jan",
+  via:[[-41.7497,171.5549],[-42.1154,171.3297],[-42.4673,171.1877]], dash:false, est:"100 km · 1h30",
+  fb:[[-41.750,171.555],[-41.85,171.50],[-42.00,171.40],[-42.115,171.330],[-42.25,171.29],[-42.40,171.22],[-42.467,171.188]]},
+
+ {id:"l6", name:"Greymouth → Hokitika Gorge (day trip)", day:"Tue 19 Jan",
+  via:[[-42.4673,171.1877],[-42.7167,170.9667],[-42.9556,171.0167]], dash:true, est:"65 km each way · 1h00",
+  fb:[[-42.467,171.188],[-42.63,171.19],[-42.72,170.97],[-42.86,171.00],[-42.956,171.017]]},
+
+ {id:"l7", name:"Greymouth → Akaroa", day:"Wed 20 Jan",
+  via:[[-42.4673,171.1877],[-42.9402,171.5620],[-43.7500,172.7833],[-43.7965,172.9711]], dash:false, est:"330 km · 4h45",
+  fb:[[-42.467,171.188],[-42.63,171.19],[-42.75,171.35],[-42.85,171.57],[-42.940,171.562],[-43.02,171.75],[-43.34,171.93],[-43.45,172.20],[-43.53,172.45],[-43.55,172.62],[-43.70,172.68],[-43.75,172.78],[-43.78,172.92],[-43.797,172.971]]},
+
+ {id:"l8", name:"Akaroa → Christchurch Airport", day:"Sat 23 Jan",
+  via:[[-43.7965,172.9711],[-43.7500,172.7833],[-43.4876,172.5374]], dash:true, est:"100 km · 1h45",
+  fb:[[-43.797,172.971],[-43.78,172.92],[-43.75,172.78],[-43.70,172.68],[-43.55,172.62],[-43.4876,172.5374]]}
+];
+
+const map = L.map('map',{scrollWheelZoom:false}).setView([-42.3,172.4],7);
+map.on('click',()=>map.scrollWheelZoom.enable());
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:19
+}).addTo(map);
+
+/* draw fallbacks immediately so the map is never empty, then upgrade to real roads */
+const drawn = {};
+LEGS.forEach(L_=>{
+  drawn[L_.id] = L.polyline(L_.fb,{
+    color:'#A9683A', weight:L_.dash?2.5:3.4, opacity:L_.dash?.45:.55,
+    dashArray:L_.dash?'6 7':'3 6'
+  }).addTo(map);
+});
+
+/* ---- live road routing via OSRM ---- */
+const OSRM = 'https://router.project-osrm.org/route/v1/driving/';
+const statusEl = document.getElementById('routeStatus');
+const legBody  = document.getElementById('legBody');
+
+function hm(sec){
+  const h=Math.floor(sec/3600), m=Math.round((sec%3600)/60);
+  return h ? h+'h'+String(m).padStart(2,'0') : m+' min';
+}
+
+LEGS.forEach(L_=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td>'+L_.name+'<span class="lday">'+L_.day+'</span></td>'+
+               '<td class="num">'+L_.est+'</td>'+
+               '<td class="num" id="r-'+L_.id+'">…</td>';
+  legBody.appendChild(tr);
+});
+
+let ok=0, fail=0;
+function report(){
+  if(ok+fail < LEGS.length) return;
+  statusEl.textContent = fail===0
+    ? 'Road routes loaded. Distances and times below are routed figures, not estimates.'
+    : (ok===0
+        ? 'Routing service unreachable — showing approximate lines. Distances below remain my estimates.'
+        : ok+' of '+LEGS.length+' legs routed. The rest are shown as approximations.');
+  statusEl.className = 'status ' + (fail===0?'good':(ok===0?'bad':'part'));
+}
+
+LEGS.forEach((L_,i)=>{
+  const coords = L_.via.map(p=>p[1].toFixed(5)+','+p[0].toFixed(5)).join(';');
+  setTimeout(()=>{
+    fetch(OSRM+coords+'?overview=full&geometries=geojson')
+      .then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(d=>{
+        if(!d.routes || !d.routes.length) throw new Error('no route');
+        const rt = d.routes[0];
+        const latlngs = rt.geometry.coordinates.map(c=>[c[1],c[0]]);
+        map.removeLayer(drawn[L_.id]);
+        drawn[L_.id] = L.polyline(latlngs,{
+          color:'#A9683A', weight:L_.dash?2.6:3.6, opacity:L_.dash?.6:.95,
+          dashArray:L_.dash?'6 7':null, lineJoin:'round'
+        }).addTo(map);
+        document.getElementById('r-'+L_.id).textContent =
+          Math.round(rt.distance/1000)+' km · '+hm(rt.duration);
+        document.getElementById('r-'+L_.id).classList.add('live');
+        ok++; report();
+      })
+      .catch(()=>{
+        document.getElementById('r-'+L_.id).textContent = 'not routed';
+        fail++; report();
+      });
+  }, i*220);
+});
+
+
+const side = document.getElementById('side');
+const markers = [];
+let idx = 0;
+
+S.forEach(group=>{
+  const g=document.createElement('div');
+  g.className='grp';
+  g.innerHTML='<h2>'+group.g+'</h2><p>'+group.gd+'</p>';
+  side.appendChild(g);
+
+  group.items.forEach(it=>{
+    const i = idx++;
+    const stay = it.k==='stay';
+    const col = it.swim ? '#14607C' : '#7B877F';
+    const size = stay ? 17 : 11;
+    const icon = L.divIcon({
+      className:'', iconSize:[size,size], iconAnchor:[size/2,size/2],
+      html:'<div class="'+(stay?'marker-dot':'marker-wp')+'" style="width:'+size+'px;height:'+size+'px;'+(stay?'background:'+col+';':'')+'"></div>'
+    });
+    const links =
+      '<a class="pop-a" href="https://maps.google.com/?cid='+it.cid+'" target="_blank" rel="noopener">Google Maps</a>' +
+      (it.url ? '<a class="pop-a" href="'+it.url+'" target="_blank" rel="noopener">Website</a>' : '');
+    const html =
+      '<p class="pop-t">'+it.n+'</p>'+
+      '<p class="pop-d">'+it.d+'</p>'+
+      '<div class="pop-w'+(it.swim?'':' dry')+'">'+it.w+'</div>'+
+      '<p class="pop-n">'+it.note+'</p>'+
+      '<p class="pop-m">'+it.meta+'</p>'+links;
+
+    const m = L.marker(it.ll,{icon:icon,title:it.n}).addTo(map).bindPopup(html);
+    m.on('click',()=>select(i,false));
+    markers.push(m);
+
+    const b=document.createElement('button');
+    b.type='button'; b.className='row';
+    b.innerHTML='<span class="nm"><span class="sw" style="background:'+(stay?col:'#F7F8F3')+';'+(stay?'':'border:1.5px solid #7B877F')+'"></span>'+it.n+'</span><span class="mt">'+it.d+'</span>';
+    b.addEventListener('click',()=>select(i,true));
+    side.appendChild(b);
+  });
+});
+
+const rows = Array.from(document.querySelectorAll('.row'));
+function select(i,fly){
+  rows.forEach((r,j)=>r.classList.toggle('on',j===i));
+  if(fly) map.setView(markers[i].getLatLng(), Math.max(map.getZoom(),10), {animate:true});
+  markers[i].openPopup();
+}
+</script>
+</body>
+</html>
