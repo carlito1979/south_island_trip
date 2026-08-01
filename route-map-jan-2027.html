@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Route map — Top of the South, January 2027</title>
+<style>
+  :root{
+    --paper:#EDEFE8;
+    --paper-2:#F7F8F3;
+    --land:#E3E7DC;
+    --sea:#DCE7EA;
+    --ink:#1B2420;
+    --ink-soft:#4E5B54;
+    --ink-faint:#7B877F;
+    --bush:#2E5A3C;
+    --water:#14607C;
+    --water-pale:#D3E3EA;
+    --contour:#A9683A;
+    --rule:#C6CBBD;
+    --amber:#A9761A;
+    --display:"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed",Helvetica,Arial,sans-serif;
+    --body:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+  .sheet{max-width:1120px;margin:0 auto;padding:48px 24px 80px}
+
+  .eyebrow{font-family:var(--display);text-transform:uppercase;letter-spacing:.22em;font-size:12px;color:var(--contour);margin:0 0 12px}
+  h1{font-family:var(--display);font-size:clamp(36px,6.5vw,58px);line-height:.96;font-weight:700;margin:0 0 14px;text-transform:uppercase}
+  h1 .sub{color:var(--water)}
+  .dek{max-width:40em;font-size:17px;color:var(--ink-soft);margin:0 0 28px}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr);gap:32px;align-items:start}
+  @media(max-width:860px){.layout{grid-template-columns:1fr;gap:24px}}
+
+  /* ---- map ---- */
+  .mapwrap{background:var(--sea);border:1px solid var(--rule);position:relative}
+  svg.map{display:block;width:100%;height:auto}
+  .land{fill:var(--land);stroke:#B8C0B2;stroke-width:1}
+  .route{fill:none;stroke:var(--contour);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+  .route-return{fill:none;stroke:var(--contour);stroke-width:1.6;stroke-dasharray:5 5;opacity:.65}
+  .waypoint circle{fill:var(--paper-2);stroke:var(--ink-faint);stroke-width:1.2}
+  .waypoint text{font-family:var(--display);font-size:9.5px;fill:var(--ink-faint);letter-spacing:.06em}
+
+  .stop{cursor:pointer}
+  .stop .halo{fill:var(--water);opacity:0;transition:opacity .18s}
+  .stop .dot{fill:var(--water);stroke:var(--paper-2);stroke-width:2.5;transition:r .18s}
+  .stop .lbl{font-family:var(--display);font-size:13px;font-weight:700;fill:var(--ink);letter-spacing:.02em;text-transform:uppercase}
+  .stop .nts{font-family:var(--display);font-size:9.5px;fill:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase}
+  .stop:hover .halo,.stop.on .halo{opacity:.16}
+  .stop:hover .dot{r:8}
+  .stop.on .dot{fill:var(--contour);r:9}
+  .stop.on .lbl{fill:var(--contour)}
+  .stop:focus{outline:none}
+  .stop:focus-visible .halo{opacity:.3}
+  .stop.dry .dot{fill:var(--ink-faint)}
+  .stop.dry.on .dot{fill:var(--contour)}
+  .start .dot{fill:none;stroke:var(--ink);stroke-width:2.5}
+
+  .compass text{font-family:var(--display);font-size:11px;fill:var(--ink-faint);letter-spacing:.14em}
+  .compass path{fill:none;stroke:var(--ink-faint);stroke-width:1.2}
+  .scalebar line{stroke:var(--ink-faint);stroke-width:1.2}
+  .scalebar text{font-family:var(--display);font-size:9.5px;fill:var(--ink-faint);letter-spacing:.08em}
+
+  /* ---- panel ---- */
+  .panel{position:sticky;top:24px}
+  @media(max-width:860px){.panel{position:static}}
+  .panel-inner{background:var(--paper-2);border:1px solid var(--rule);padding:22px}
+  .p-num{font-family:var(--display);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--contour);margin:0 0 6px}
+  .p-name{font-family:var(--display);font-size:30px;line-height:1.05;margin:0 0 4px;text-transform:uppercase;font-weight:700}
+  .p-dates{font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 16px}
+  .p-park{font-size:14px;color:var(--ink-soft);margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+  .p-water{border-left:3px solid var(--water);background:var(--water-pale);padding:11px 13px;margin:0 0 16px}
+  .p-water span{display:block;font-family:var(--display);text-transform:uppercase;letter-spacing:.14em;font-size:10px;color:var(--water);margin-bottom:3px}
+  .p-water p{margin:0;font-style:italic;color:var(--water);font-size:14.5px;line-height:1.5}
+  .p-water.dry{border-left-color:var(--ink-faint);background:#E4E7DF}
+  .p-water.dry span,.p-water.dry p{color:var(--ink-soft)}
+  .p-do{margin:0 0 16px;padding:0;list-style:none}
+  .p-do li{font-size:15px;padding:7px 0 7px 18px;position:relative;border-bottom:1px solid var(--rule);color:var(--ink-soft)}
+  .p-do li:last-child{border-bottom:none}
+  .p-do li::before{content:"";position:absolute;left:0;top:15px;width:7px;height:7px;border:1.5px solid var(--bush)}
+  .p-leg{font-family:var(--display);text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--contour);border-top:1px solid var(--rule);padding-top:12px}
+  .p-leg em{display:block;font-family:var(--body);text-transform:none;letter-spacing:0;font-style:italic;font-size:14px;color:var(--ink-soft);margin-top:4px}
+
+  .nav{display:flex;gap:8px;margin-top:14px}
+  .nav button{
+    flex:1;font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:11px;
+    padding:10px;background:var(--paper);border:1px solid var(--ink);color:var(--ink);cursor:pointer;
+  }
+  .nav button:hover{background:var(--ink);color:var(--paper)}
+  .nav button:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+  .nav button[disabled]{opacity:.3;cursor:default}
+  .nav button[disabled]:hover{background:var(--paper);color:var(--ink)}
+
+  /* ---- strip ---- */
+  .strip{display:flex;flex-wrap:wrap;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:32px}
+  .strip button{
+    flex:1 1 120px;background:var(--paper-2);border:none;padding:12px 14px;text-align:left;cursor:pointer;
+    font-family:var(--body);border-top:3px solid transparent;
+  }
+  .strip button:hover{background:#fff}
+  .strip button.on{border-top-color:var(--contour);background:#fff}
+  .strip button:focus-visible{outline:2px solid var(--water);outline-offset:-2px}
+  .strip .s-name{display:block;font-family:var(--display);text-transform:uppercase;letter-spacing:.05em;font-size:14px;font-weight:700}
+  .strip .s-meta{display:block;font-size:12px;color:var(--ink-faint)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:20px;margin-top:20px;font-size:13px;color:var(--ink-faint)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+  footer{margin-top:56px;padding-top:18px;border-top:2px solid var(--ink);font-size:13px;color:var(--ink-faint)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media print{body{background:#fff}.nav,.strip{display:none}.panel{position:static}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<p class="eyebrow">Top of the South · JUCY Condo · 1,510 km</p>
+<h1>The <span class="sub">Route</span></h1>
+<p class="dek">Fourteen nights, six bases, a clockwise loop out of Christchurch. Tap any stop for what's there and what you can swim in. The dashed line is the run back to the airport on the final morning.</p>
+
+<div class="layout">
+
+  <div class="mapwrap">
+    <svg class="map" viewBox="0 0 620 730" role="img" aria-label="Map of the northern South Island showing a clockwise route from Christchurch through Hanmer Springs, Kaikoura, Motueka, Carters Beach, Greymouth and Akaroa.">
+
+      <!-- landmass, approximate coastline -->
+      <path class="land" d="M337.7,20 L388.1,20 L364.4,44 L337.7,56 L355.5,90 L370.3,84 L383.7,64 L388.1,86 L385.2,122 L388.1,146 L399.9,170 L426.6,174 L447.3,152 L474.0,140 L511.1,110 L583.7,116 L548.1,190 L570.3,244 L573.3,266 L536.3,318 L491.8,406 L454.7,444 L392.5,530 L352.5,550 L343.6,598 L349.6,634 L401.4,664 L374.7,696 L340.7,684 L303.6,694 L266.6,712 L29.6,712 L59.3,496 L82.9,464 L118.5,410 L136.3,342 L155.6,274 L170.4,270 L177.8,268 L253.3,170 L266.6,90 Z"/>
+
+      <!-- return leg -->
+      <path class="route-return" d="M380.8,679 L352.5,670 L330,640 L316.6,617"/>
+
+      <!-- main route -->
+      <path class="route" d="M316.6,617 L350,555 L360,426
+        L420,392 L486,399
+        L536,318 L528,222 L470,180 L427,174 L387,141
+        L392,200 L348,230 L286,280 L230,294 L178,268 L171,270
+        L136,342 L117,414
+        L117,446 L173,490 L172,508 L227,588 L300,624 L330,646 L352,670 L381,679"/>
+
+      <!-- waypoints -->
+      <g class="waypoint">
+        <circle cx="470" cy="180" r="3"/><text x="462" y="172" text-anchor="end">Pelorus Bridge</text>
+        <circle cx="388" cy="127" r="3"/><text x="396" y="120">Kaiteriteri</text>
+        <circle cx="156" cy="274" r="3"/><text x="149" y="266" text-anchor="end">Cape Foulwind</text>
+        <circle cx="136" cy="343" r="3"/><text x="144" y="337">Punakaiki</text>
+        <circle cx="116" cy="427" r="3"/><text x="124" y="437">Shantytown</text>
+        <circle cx="91" cy="511" r="3"/><text x="99" y="516">Hokitika Gorge</text>
+        <circle cx="172" cy="508" r="3"/><text x="180" y="503">Arthur's Pass</text>
+        <circle cx="491" cy="405" r="3"/><text x="499" y="399">Point Kean</text>
+      </g>
+
+      <!-- stops -->
+      <g class="stop start" data-i="0" tabindex="0" role="button" aria-label="Christchurch Airport, start and finish">
+        <circle class="halo" cx="316.6" cy="617.5" r="20"/>
+        <circle class="dot" cx="316.6" cy="617.5" r="6.5"/>
+        <text class="lbl" x="304" y="613" text-anchor="end">Christchurch</text>
+        <text class="nts" x="304" y="626" text-anchor="end">Start · Finish</text>
+      </g>
+
+      <g class="stop" data-i="1" tabindex="0" role="button" aria-label="Hanmer Springs, two nights">
+        <circle class="halo" cx="360" cy="425.6" r="20"/>
+        <circle class="dot" cx="360" cy="425.6" r="6.5"/>
+        <text class="lbl" x="348" y="422" text-anchor="end">Hanmer Springs</text>
+        <text class="nts" x="348" y="435" text-anchor="end">2 nights</text>
+      </g>
+
+      <g class="stop" data-i="2" tabindex="0" role="button" aria-label="Kaikoura, two nights">
+        <circle class="halo" cx="485.9" cy="399.2" r="20"/>
+        <circle class="dot" cx="485.9" cy="399.2" r="6.5"/>
+        <text class="lbl" x="498" y="382">Kaikōura</text>
+        <text class="nts" x="498" y="395">2 nights</text>
+      </g>
+
+      <g class="stop" data-i="3" tabindex="0" role="button" aria-label="Motueka, three nights">
+        <circle class="halo" cx="387.2" cy="140.9" r="20"/>
+        <circle class="dot" cx="387.2" cy="140.9" r="6.5"/>
+        <text class="lbl" x="375" y="150" text-anchor="end">Motueka</text>
+        <text class="nts" x="375" y="163" text-anchor="end">3 nights</text>
+      </g>
+
+      <g class="stop" data-i="4" tabindex="0" role="button" aria-label="Carters Beach, two nights">
+        <circle class="halo" cx="171.1" cy="269.9" r="20"/>
+        <circle class="dot" cx="171.1" cy="269.9" r="6.5"/>
+        <text class="lbl" x="183" y="256">Carters Beach</text>
+        <text class="nts" x="183" y="269">2 nights</text>
+      </g>
+
+      <g class="stop dry" data-i="5" tabindex="0" role="button" aria-label="Greymouth, two nights">
+        <circle class="halo" cx="116.7" cy="413.5" r="20"/>
+        <circle class="dot" cx="116.7" cy="413.5" r="6.5"/>
+        <text class="lbl" x="129" y="400">Greymouth</text>
+        <text class="nts" x="129" y="413">2 nights</text>
+      </g>
+
+      <g class="stop" data-i="6" tabindex="0" role="button" aria-label="Akaroa, three nights">
+        <circle class="halo" cx="380.8" cy="679.3" r="20"/>
+        <circle class="dot" cx="380.8" cy="679.3" r="6.5"/>
+        <text class="lbl" x="393" y="676">Akaroa</text>
+        <text class="nts" x="393" y="689">3 nights</text>
+      </g>
+
+      <!-- compass and scale -->
+      <g class="compass" transform="translate(566,44)">
+        <path d="M0,26 L0,-12 M-6,-4 L0,-14 L6,-4"/>
+        <text x="0" y="42" text-anchor="middle">N</text>
+      </g>
+      <g class="scalebar" transform="translate(40,684)">
+        <line x1="0" y1="0" x2="74" y2="0"/>
+        <line x1="0" y1="-5" x2="0" y2="5"/>
+        <line x1="74" y1="-5" x2="74" y2="5"/>
+        <text x="37" y="18" text-anchor="middle">50 KM</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <div class="panel-inner">
+      <p class="p-num" id="pNum"></p>
+      <h2 class="p-name" id="pName"></h2>
+      <p class="p-dates" id="pDates"></p>
+      <p class="p-park" id="pPark"></p>
+      <div class="p-water" id="pWater"><span id="pWaterLabel"></span><p id="pWaterText"></p></div>
+      <ul class="p-do" id="pDo"></ul>
+      <p class="p-leg" id="pLeg"></p>
+    </div>
+    <div class="nav">
+      <button type="button" id="prev">← Previous</button>
+      <button type="button" id="next">Next →</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="strip" id="strip"></div>
+
+<div class="legend">
+  <span><i class="sw" style="background:#14607C"></i>Pool or safe swimming</span>
+  <span><i class="sw" style="background:#7B877F"></i>No swimming at the park</span>
+  <span><i class="sw" style="background:#A9683A"></i>Driving route</span>
+  <span><i class="sw" style="background:#F7F8F3;border:1px solid #7B877F"></i>Day stop, no overnight</span>
+</div>
+
+<footer>
+  <p>Coastline is schematic; stop positions are plotted from real coordinates, so relative distances and bearings are true. Drive times are estimates, not routed figures. Checked against operator listings as at 01/08/2026.</p>
+</footer>
+
+</div>
+
+<script>
+const stops = [
+  {
+    num:"Start and finish", name:"Christchurch", dates:"Sat 9 Jan · Sat 23 Jan",
+    park:"JUCY depot, Christchurch Airport. Collect at 2pm on the 9th, return by 10am on the 23rd.",
+    waterLabel:"Note", water:"Nothing to swim in here — this is a transit point at both ends of the trip.", dry:true,
+    do:[
+      "Collect the van at 2pm on Saturday 9 January and head straight north. Do a supermarket shop before you leave the city.",
+      "On the return, leave Akaroa by 07:30. Refuel at Little River or Lincoln, where it's cheaper than Akaroa.",
+      "Allow 45 minutes at the depot. JUCY will want the van refuelled and reasonably clean."
+    ],
+    leg:"Christchurch → Hanmer Springs · 135 km · 1h45|Up SH1 then inland at Waipara."
+  },
+  {
+    num:"Base 01", name:"Hanmer Springs", dates:"Sat 9 – Sun 10 January · 2 nights",
+    park:"Hanmer Springs TOP 10 Holiday Park",
+    waterLabel:"Water here", water:"No pool at the park, but private wood-fired hot tubs at about $39 an hour. The Thermal Pools are a 400 m walk: hot pools, waterslides, a lazy river and a kids' play area.", dry:false,
+    do:[
+      "Book a hot tub for the first evening — the cheapest good thing on the whole trip.",
+      "Thermal Pools on Saturday morning, before the queues build.",
+      "A-Maze-N-Golf next door, the Animal Park five minutes' walk, Dog Stream Waterfall track from the forest behind.",
+      "Optional: jet boating and bungy at Ferry Bridge, 10 minutes down the valley."
+    ],
+    leg:"Hanmer Springs → Kaikōura · 130 km · 1h45|Take the Inland Road via Waiau, not back down to SH1."
+  },
+  {
+    num:"Base 02", name:"Kaikōura", dates:"Mon 11 – Tue 12 January · 2 nights",
+    park:"Kaikōura TOP 10 Holiday Park",
+    waterLabel:"Water here", water:"Swimming pool at the park — this is where you swim. Local beaches are gravel and exposed, sea near 15°C. Short walk to the Whale Watch departure point.", dry:false,
+    do:[
+      "Point Kean seal colony at the end of the peninsula. Free, with pups in the rock pools in January.",
+      "Kaikōura Peninsula Walkway along the clifftop, then crayfish or fish and chips in town.",
+      "Whale Watch, Monday 7:15am check-in. Earliest sailing means calmest seas and two same-day fallbacks.",
+      "Medicate for seasickness one to two hours before departure, not once symptoms start."
+    ],
+    leg:"Kaikōura → Motueka · 370 km · 4h45 · longest leg|Break it at Pelorus Bridge for lunch and a river swim."
+  },
+  {
+    num:"Base 03", name:"Motueka", dates:"Wed 13 – Fri 15 January · 3 nights",
+    park:"Motueka TOP 10 Holiday Park",
+    waterLabel:"Water here — the best of the trip", water:"Pool at the park plus a private spa free with TOP 10 membership. Kaiteriteri is 20 minutes: golden sand, calm water, a tidal lagoon, sea near 19°C. The warmest, safest swimming on the loop.", dry:false,
+    do:[
+      "Thu 14: Abel Tasman water taxi with Wilsons, out 10:30 and back 4:15, to Anchorage Beach.",
+      "Optional Pitt Head loop to Te Pukatea if she's got the legs — about 1.5 hours.",
+      "Fri 15: winery lunch in Upper Moutere. Three options, decision still open.",
+      "The Kaiteriteri car park is full by 10am in January. Go early or park at Little Kaiteriteri and walk round."
+    ],
+    leg:"Motueka → Carters Beach · 245 km · 3h15|Over the Hope Saddle and down the Buller Gorge. Stop at the swingbridge."
+  },
+  {
+    num:"Base 04", name:"Carters Beach", dates:"Sat 16 – Sun 17 January · 2 nights",
+    park:"Carters Beach TOP 10 Holiday Park, Westport",
+    waterLabel:"Water here", water:"No pool, but a safe sandy swimming beach 100 metres from the front gate — the only genuinely swimmable West Coast beach on the route. Hot tubs for hire. Sea around 16°C.", dry:false,
+    do:[
+      "Cape Foulwind seal colony, 15 minutes away and free.",
+      "Clifftop track through to Tauranga Bay and back, about 90 minutes with stops.",
+      "Kawatiri Coastal Trail starts outside the gate. Denniston Incline 30 minutes north if the weather turns.",
+      "Ask for a hardstanding site — the grass turns to mud in West Coast rain."
+    ],
+    leg:"Carters Beach → Greymouth · 100 km · 1h30|The Great Coast Road. Only 90 minutes, so the day belongs to Punakaiki."
+  },
+  {
+    num:"Base 05", name:"Greymouth", dates:"Mon 18 – Tue 19 January · 2 nights",
+    park:"Greymouth Seaside TOP 10 Holiday Park, Karoro",
+    waterLabel:"Water here — the one dry stop", water:"No pool, and the beach is not swimmable: rips and driftwood. Private spa pool for hire on site. The Grey District Aquatic Centre is ten minutes away and covers the gap.", dry:true,
+    do:[
+      "Pancake Rocks at Punakaiki on the way through. Time it near high tide or you get rocks without the blowholes.",
+      "Shantytown, open 10am to 3pm: steam train, sawmill, sluice gun and gold panning. The best fit on the route for her.",
+      "Tue 19: Hokitika Gorge, a 2.4 km loop with swing bridges. Colour only shows after dry weather.",
+      "Pounamu or bone carving in Hokitika, then the free glow worm dell at dusk."
+    ],
+    leg:"Greymouth → Akaroa · 330 km · 4h45|Over Arthur's Pass and across the plains, then the Summit Road into the crater."
+  },
+  {
+    num:"Base 06", name:"Akaroa", dates:"Wed 20 – Fri 22 January · 3 nights",
+    park:"Akaroa TOP 10 Holiday Park",
+    waterLabel:"Water here", water:"Decent-sized pool at the park. The main beach is sheltered harbour water and safe for swimming, around 18°C. Ōkains Bay, 35 minutes over the hill, has proper sand and surf.", dry:false,
+    do:[
+      "Thu 21: Black Cat Hector's dolphin swim. Max 12 swimmers, minimum age 8, sheltered harbour, hot showers.",
+      "The Giant's House mosaic garden — a whole hillside of broken-china sculpture.",
+      "Fri 22 is deliberately clear. If the swim is cancelled for conditions, this is your second attempt.",
+      "Kea at Arthur's Pass will strip the van's window seals. Don't leave it unattended with food visible."
+    ],
+    leg:"Akaroa → Christchurch Airport · 100 km · 1h45|Leave by 07:30. The Summit Road is not a route to rush."
+  }
+];
+
+const els = {
+  num:document.getElementById('pNum'), name:document.getElementById('pName'),
+  dates:document.getElementById('pDates'), park:document.getElementById('pPark'),
+  water:document.getElementById('pWater'), wlabel:document.getElementById('pWaterLabel'),
+  wtext:document.getElementById('pWaterText'), do:document.getElementById('pDo'),
+  leg:document.getElementById('pLeg'), prev:document.getElementById('prev'),
+  next:document.getElementById('next'), strip:document.getElementById('strip')
+};
+const nodes = Array.from(document.querySelectorAll('.stop'));
+let active = 1;
+
+stops.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.type='button';
+  b.innerHTML='<span class="s-name">'+s.name+'</span><span class="s-meta">'+s.dates.split(' · ')[0]+'</span>';
+  b.addEventListener('click',()=>show(i));
+  els.strip.appendChild(b);
+});
+const chips = Array.from(els.strip.children);
+
+function show(i){
+  active=i;
+  const s=stops[i];
+  els.num.textContent=s.num;
+  els.name.textContent=s.name;
+  els.dates.textContent=s.dates;
+  els.park.textContent=s.park;
+  els.wlabel.textContent=s.waterLabel;
+  els.wtext.textContent=s.water;
+  els.water.className='p-water'+(s.dry?' dry':'');
+  els.do.innerHTML='';
+  s.do.forEach(d=>{const li=document.createElement('li');li.textContent=d;els.do.appendChild(li)});
+  const parts=s.leg.split('|');
+  els.leg.innerHTML='Next leg — '+parts[0]+'<em>'+parts[1]+'</em>';
+  nodes.forEach((n,j)=>n.classList.toggle('on',j===i));
+  chips.forEach((c,j)=>c.classList.toggle('on',j===i));
+  els.prev.disabled = i===0;
+  els.next.disabled = i===stops.length-1;
+}
+
+nodes.forEach(n=>{
+  const i=+n.dataset.i;
+  n.addEventListener('click',()=>show(i));
+  n.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i)}
+  });
+});
+els.prev.addEventListener('click',()=>show(Math.max(0,active-1)));
+els.next.addEventListener('click',()=>show(Math.min(stops.length-1,active+1)));
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='BUTTON')return;
+  if(e.key==='ArrowRight')show(Math.min(stops.length-1,active+1));
+  if(e.key==='ArrowLeft')show(Math.max(0,active-1));
+});
+
+show(1);
+</script>
+</body>
+</html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Booking checklist — Top of the South, January 2027</title>
+<style>
+  :root{
+    --paper:#EDEFE8;--paper-2:#F7F8F3;--ink:#1B2420;--ink-soft:#4E5B54;--ink-faint:#7B877F;
+    --bush:#2E5A3C;--water:#14607C;--water-pale:#D3E3EA;--contour:#A9683A;--rule:#C6CBBD;
+    --amber:#A9761A;--red:#9A3B2A;
+    --display:"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed",Helvetica,Arial,sans-serif;
+    --body:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+  .sheet{max-width:920px;margin:0 auto;padding:52px 24px 96px}
+
+  .eyebrow{font-family:var(--display);text-transform:uppercase;letter-spacing:.22em;font-size:12px;color:var(--contour);margin:0 0 12px}
+  h1{font-family:var(--display);font-size:clamp(38px,7vw,62px);line-height:.96;font-weight:700;margin:0 0 14px;text-transform:uppercase}
+  h1 .sub{display:block;color:var(--water)}
+  .dek{max-width:38em;font-size:17px;color:var(--ink-soft);margin:0 0 28px}
+
+  /* progress + toolbar */
+  .bar{background:var(--paper-2);border:1px solid var(--rule);padding:16px 18px;margin:0 0 12px}
+  .bar-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .bar-lab{font-family:var(--display);text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--ink-faint)}
+  .bar-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1}
+  .bar-val small{font-family:var(--body);font-size:13px;font-weight:400;color:var(--ink-faint);letter-spacing:0}
+  .track{height:7px;background:#DDE2D8;margin-top:12px}
+  .fill{height:7px;background:var(--bush);width:0;transition:width .25s}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 34px}
+  .tools button{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:11px;padding:11px 16px;background:var(--paper-2);border:1px solid var(--ink);color:var(--ink);cursor:pointer}
+  .tools button:hover{background:var(--ink);color:var(--paper)}
+  .tools button:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+  .tools .warn{border-color:var(--red);color:var(--red)}
+  .tools .warn:hover{background:var(--red);color:#fff}
+  .saved{font-size:12px;color:var(--ink-faint);align-self:center;font-style:italic}
+
+  .callout{border-left:3px solid var(--water);background:var(--water-pale);padding:14px 16px;margin:0 0 30px;font-size:15px;color:var(--water);font-style:italic}
+  .warnbox{border-left:3px solid var(--amber);background:#F2EBDA;padding:12px 15px;margin:0 0 26px;font-size:14px;color:#6B4E10}
+
+  h2{font-family:var(--display);text-transform:uppercase;letter-spacing:.16em;font-size:13px;font-weight:700;color:var(--bush);margin:52px 0 6px;padding-bottom:9px;border-bottom:1.5px solid var(--bush);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  h2 .when{color:var(--contour);letter-spacing:.1em;font-weight:400}
+  .lede{font-size:14px;color:var(--ink-faint);margin:0 0 14px}
+
+  .item{border-bottom:1px solid var(--rule);padding:20px 0}
+  .item.done .head h3,.item.done .head p{opacity:.5}
+  .head{display:grid;grid-template-columns:26px 1fr 120px;gap:16px;align-items:start}
+  @media(max-width:620px){.head{grid-template-columns:26px 1fr}.head .cost{grid-column:2;text-align:left;padding-top:0}}
+  .tick{width:20px;height:20px;margin-top:5px;accent-color:#2E5A3C;cursor:pointer}
+  .item h3{font-family:var(--display);font-size:21px;margin:0 0 5px;letter-spacing:.01em}
+  .item p{margin:0 0 8px;font-size:15px;color:var(--ink-soft)}
+  .item .meta{font-size:13px;color:var(--ink-faint);margin:0}
+  .cost{font-family:var(--display);font-size:22px;font-weight:700;text-align:right;padding-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .cost small{display:block;font-family:var(--body);font-size:11px;font-weight:400;color:var(--ink-faint);letter-spacing:0}
+
+  .tag{display:inline-block;font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:10px;padding:2px 7px;margin:0 6px 6px 0;border:1px solid currentColor}
+  .t-now{color:var(--red)}.t-soon{color:var(--amber)}.t-day{color:var(--water)}.t-open{color:var(--bush)}
+
+  .links{margin:8px 0 0}
+  .links a{display:inline-block;font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:10px;border:1px solid var(--water);color:var(--water);padding:5px 9px;text-decoration:none;margin:0 6px 6px 0}
+  .links a:hover{background:var(--water);color:#fff}
+  .links a:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+
+  .notes{margin:14px 0 0 42px}
+  @media(max-width:620px){.notes{margin-left:42px}}
+  .notes label{display:block;font-family:var(--display);text-transform:uppercase;letter-spacing:.14em;font-size:10px;color:var(--ink-faint);margin-bottom:5px}
+  .notes textarea{
+    width:100%;min-height:52px;resize:vertical;font-family:var(--body);font-size:14.5px;line-height:1.55;
+    padding:9px 11px;border:1px solid var(--rule);background:var(--paper-2);color:var(--ink);
+  }
+  .notes textarea:focus{outline:none;border-color:var(--water);background:#fff}
+  .notes textarea.has{border-left:3px solid var(--water)}
+
+  table{width:100%;border-collapse:collapse;font-size:15px;margin:0}
+  th{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--ink-faint);text-align:left;padding:0 12px 7px 0;border-bottom:1.5px solid var(--ink);font-weight:700}
+  td{padding:9px 12px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+  td.num,th.num{text-align:right;padding-right:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.total td{border-bottom:none;border-top:1.5px solid var(--ink);font-weight:700}
+
+  footer{margin-top:60px;padding-top:20px;border-top:2px solid var(--ink);font-size:13px;color:var(--ink-faint)}
+
+  @media print{
+    body{background:#fff;font-size:11pt}.sheet{max-width:none;padding:0}
+    .tools,.bar .track{display:none}.item{break-inside:avoid}
+    .notes textarea{border:none;border-left:2px solid #999;background:#fff;min-height:0}
+    a{color:inherit}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<p class="eyebrow">Top of the South · 9–23 January 2027</p>
+<h1>Booking<span class="sub">Checklist</span></h1>
+<p class="dek">Ordered by how soon it needs doing, not by when it happens. Tick things off and write notes against each one — confirmation numbers, who you spoke to, what they said. Everything saves in this browser and comes with you when you export the report.</p>
+
+<div class="bar">
+  <div class="bar-top">
+    <div>
+      <div class="bar-lab">Booked</div>
+      <div class="bar-val" id="pCount">0 <small>of 13</small></div>
+    </div>
+    <div style="text-align:right">
+      <div class="bar-lab">Committed so far</div>
+      <div class="bar-val" id="pCost">$0 <small>of ~$2,110</small></div>
+    </div>
+  </div>
+  <div class="track"><div class="fill" id="pFill"></div></div>
+</div>
+
+<div class="tools">
+  <button type="button" id="export">Export report with my notes</button>
+  <button type="button" id="print">Print</button>
+  <button type="button" id="reset" class="warn">Clear everything</button>
+  <span class="saved" id="savedMsg"></span>
+</div>
+
+<div class="warnbox" id="storeWarn" hidden>Saving to this browser isn't available here, so your ticks and notes won't survive a refresh. Use <strong>Export report with my notes</strong> before you close the tab, or open this file directly from your downloads folder rather than in a preview window.</div>
+
+<div class="callout">Book the Akaroa dolphin swim first. Everything else on this list has an alternative; that one doesn't.</div>
+
+<div id="list"></div>
+
+<h2>The numbers</h2>
+<table>
+  <thead><tr><th>Item</th><th class="num">NZD</th></tr></thead>
+  <tbody>
+    <tr><td>Akaroa dolphin swim</td><td class="num">720</td></tr>
+    <tr><td>Whale Watch Kaikōura</td><td class="num">390</td></tr>
+    <tr><td>Abel Tasman water taxi</td><td class="num">300</td></tr>
+    <tr><td>Winery lunch</td><td class="num">180</td></tr>
+    <tr><td>Thermal pools, two visits</td><td class="num">150</td></tr>
+    <tr><td>Carving session</td><td class="num">150</td></tr>
+    <tr><td>Buller Gorge swingbridge and zipline</td><td class="num">120</td></tr>
+    <tr><td>Shantytown and gold panning</td><td class="num">100</td></tr>
+    <tr class="total"><td>Estimated activity total</td><td class="num">2,110</td></tr>
+    <tr><td>Headroom against $3,250</td><td class="num">1,140</td></tr>
+  </tbody>
+</table>
+
+<footer>
+  <p>Companion to the trip plan and route maps. Prices and lead times checked against operator listings as at 01/08/2026 — dolphin swim and Whale Watch child fares, park phone numbers and reception hours are published. The rest are estimates. Confirm everything directly before paying.</p>
+</footer>
+
+</div>
+
+<script>
+const KEY = 'bgp-sth-checklist-v1';
+
+const GROUPS = [
+{
+  title:"Book now", when:"As soon as the calendar opens",
+  lede:"These sell out, and there is no substitute if you miss them.",
+  items:[
+    { id:"dolphin", title:"Black Cat — Hector's dolphin swim", cost:"$720", costNote:"2 adults + 1 child", costVal:720,
+      desc:"Thursday 21 January, Akaroa. Maximum 12 swimmers per tour, minimum age 8. Sheltered harbour, covered vessel with a toilet, 5mm wetsuits and hot showers. 98% sighting rate, and a free return ticket on the nature cruise if you see none.",
+      tags:[["t-now","Book first"]],
+      meta:"03 304 7641 · office 9am–5pm · adult $250, child 8–15 $220, spectator $180. Thursday the 22nd is held clear as your weather fallback.",
+      links:[["Black Cat","http://www.blackcat.co.nz/"],["Google Maps","https://maps.google.com/?cid=5177962898306884718"]] },
+
+    { id:"whale", title:"Whale Watch Kaikōura", cost:"$390", costNote:"estimate", costVal:390,
+      desc:"Tuesday 12 January, 7:15am check-in. Roughly 3.5 hours by catamaran. Take the earliest sailing: calmest seas, and the 10:00am and 12:45pm departures stay available as same-day fallbacks if yours is cancelled.",
+      tags:[["t-now","1–3 weeks minimum"]],
+      meta:"Child 3–15 $60. Adult fare unconfirmed, budget ~$165. 80% refunded if no whale is sighted. Buy motion-sickness tablets from the town pharmacy, not on the boat.",
+      links:[["Whale Watch","https://www.whalewatch.co.nz/"]] },
+
+    { id:"taxi", title:"Abel Tasman water taxi — Wilsons", cost:"$300", costNote:"estimate", costVal:300,
+      desc:"Thursday 14 January. Return boat to Anchorage Beach, 45 minutes each way. Depart Kaiteriteri 10:30, return 4:15 — five and a half hours on golden sand, with the optional Pitt Head loop to Te Pukatea.",
+      tags:[["t-now","Fills weeks ahead"]],
+      meta:"Pricing not published; expect $250–350 for three. Cheaper alternative: Abel Tasman Sea Shuttle at $89 adult / $44 child, but that's a 7 km walking day.",
+      links:[["Wilsons","https://www.abeltasman.co.nz/water-taxi/"],["AquaTaxi","https://aquataxi.co.nz/trips/water-taxi/"],["Sea Shuttle","https://www.abeltasman.com/activities/water-taxis/"]] },
+
+    { id:"parks", title:"All six TOP 10 parks", cost:"—", costNote:"membership rate", costVal:0,
+      desc:"Hanmer Springs (2 nights), Kaikōura (2), Motueka (3), Carters Beach (2), Greymouth Seaside (2), Akaroa (3). Book direct through TOP 10 rather than an aggregator — one guest reported paying more via a booking site than their membership rate.",
+      tags:[["t-now","Peak season"]],
+      meta:"Hanmer 03 315 7113 (recep. to 6pm) · Kaikōura 03 319 5362 (to 8:30pm) · Motueka 0800 668 835 (to 7pm) · Carters Beach 03 789 8002 (to 7pm) · Greymouth 03 768 6618 (to 7pm) · Akaroa 03 304 7471 (to 8:30pm). Request hardstanding at Carters Beach and Akaroa. Confirm the pool at Hanmer while you're on the phone — two aggregators claim one, the park's own material doesn't.",
+      links:[["TOP 10","https://top10.co.nz/"],["Hanmer","https://www.hanmerspringstop10.co.nz/"],["Motueka","https://www.motuekatop10.co.nz/"],["Greymouth","http://www.top10greymouth.co.nz/"],["Akaroa","http://www.akaroatop10.co.nz/"]] }
+  ]
+},
+{
+  title:"Book a month out", when:"December 2026",
+  lede:"Popular but not scarce. Worth locking in, easy to move.",
+  items:[
+    { id:"winery", title:"Winery lunch, Upper Moutere", cost:"$180", costNote:"estimate", costVal:180,
+      desc:"Friday 15 January. Decision still open between three: Moutere Hills for the proper sit-down meal, Neudorf for a picnic basket in the garden where Ella can roam, or Kahurangi for platters in a sunny courtyard.",
+      tags:[["t-open","Decision open"],["t-soon","Ring Kahurangi first"]],
+      meta:"Moutere Hills 03 543 2288 · Neudorf 03 543 2643, tastings ~$15pp, tables booked online. The winegrowers association now redirects visitors to Heaphy Vineyards, so Kahurangi's cellar door may not be hosting. Forsters has been sold and no longer trades.",
+      links:[["Neudorf","https://neudorf.co.nz/pages/visit"],["Moutere Hills","https://mouterehillsrestaurantandcellardoor.co.nz/"],["Kahurangi","https://www.tastenelsonwines.nz/kahurangi-estate"]] },
+
+    { id:"hottub", title:"Wood-fired hot tub, Hanmer Springs TOP 10", cost:"$39", costNote:"per hour", costVal:39,
+      desc:"Saturday 9 January evening, after the drive up. Around $39 an hour for two. Book when you reserve the site — there are only a handful and they go early on summer evenings.",
+      tags:[["t-soon","Ask at booking"]],
+      meta:"03 315 7113. The Thermal Pools themselves don't need booking, just an early arrival — they run 10am to 7pm daily.",
+      links:[["Hanmer TOP 10","https://www.hanmerspringstop10.co.nz/"],["Thermal Pools","https://hanmersprings.co.nz/"]] },
+
+    { id:"carving", title:"Pounamu or bone carving, Hokitika", cost:"$150", costNote:"estimate", costVal:150,
+      desc:"Tuesday 19 January. A half-day studio session where she carves her own piece and takes it home. The strongest making-things activity on the route after gold panning.",
+      tags:[["t-soon","Small studios"]],
+      meta:"Sessions are limited and usually need booking a few days ahead in January. Pair with the free glow worm dell in town at dusk.",
+      links:[["Hokitika visitor info","https://westcoast.co.nz/visit/plan-your-trip/hokitika-gorge/"]] }
+  ]
+},
+{
+  title:"Turn up on the day", when:"No booking needed",
+  lede:"Timing matters more than reservations for these.",
+  items:[
+    { id:"shanty", title:"Shantytown Heritage Park", cost:"$100", costNote:"family + panning", costVal:100,
+      desc:"Monday 18 January, on the way down from Punakaiki. Confirmed 10am to 3pm daily — a short window, so this is a 10am start, not a lazy one. Working steam train, sawmill, sluice gun and gold panning.",
+      tags:[["t-day","Check train times"]],
+      meta:"03 762 6634. Admission includes the train ride; gold panning is roughly $7–10 a pan on top. Build the visit around the departure schedule.",
+      links:[["Shantytown","https://www.shantytown.co.nz/"],["Google Maps","https://maps.google.com/?cid=17986278334682525179"]] },
+
+    { id:"punakaiki", title:"Pancake Rocks, Punakaiki", cost:"$0", costNote:"+ parking", costVal:0,
+      desc:"Monday 18 January. A 20-minute loop walk. The blowholes only perform near high tide with a decent swell — check the tide chart the night before and time your departure from Carters Beach to match.",
+      tags:[["t-day","Tide dependent"]],
+      meta:"Open 24 hours. Parking free for 20 minutes, then $5 an hour.",
+      links:[["DOC track page","https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/"]] },
+
+    { id:"buller", title:"Buller Gorge Swingbridge", cost:"$120", costNote:"estimate", costVal:120,
+      desc:"Saturday 16 January, on the drive from Motueka to Westport. The longest swingbridge in New Zealand, with the Comet Line zipline as the return trip if she wants it.",
+      tags:[["t-day","Walk in"]],
+      meta:"Adds about an hour to a 3h15 drive. Roughly the halfway point of the day.",
+      links:[] },
+
+    { id:"free", title:"Free, and among the best of it", cost:"$0", costNote:"", costVal:0,
+      desc:"Point Kean seal colony at Kaikōura. Cape Foulwind seals and the Tauranga Bay clifftop walk. Hokitika Gorge and the glow worm dell at dusk. Pelorus Bridge river swim. Devils Punchbowl Falls at Arthur's Pass. The Giant's House at Akaroa charges a small entry; everything else here costs nothing.",
+      tags:[["t-day","No booking"]],
+      meta:"Sandfly repellent goes on before you open the van door at every one of these.",
+      links:[["Hokitika Gorge","https://westcoast.co.nz/visit/plan-your-trip/hokitika-gorge/"],["Pelorus Bridge","https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/pelorus-bridge-scenic-reserve/"]] }
+  ]
+},
+{
+  title:"Before you leave Auckland", when:"Pack list",
+  lede:"The things that will actually change how the trip feels.",
+  items:[
+    { id:"sandfly", title:"Sandfly repellent", cost:"—", costNote:"", costVal:0,
+      desc:"The West Coast and the Kaikōura peninsula are both bad, and a bitten eight-year-old changes the mood of a whole day. Buy it before you go rather than paying tourist prices in Punakaiki.",
+      tags:[["t-open","Non-negotiable"]], meta:"Worst at Point Kean, Hokitika Gorge, Punakaiki and anywhere near still water at dusk.", links:[] },
+
+    { id:"seasick", title:"Motion-sickness tablets and layers", cost:"—", costNote:"", costVal:0,
+      desc:"For the whale watch on the 12th. Medicate one to two hours before departure, not once symptoms start. Sea wind off Kaikōura is cold in midsummer, so pack a windproof layer each for the boat.",
+      tags:[["t-open","Buy at home"]], meta:"Whale Watch sells natural tablets on site but is not permitted to sell medicated ones.", links:[] },
+
+    { id:"rashie", title:"Rashies and offline maps", cost:"—", costNote:"", costVal:0,
+      desc:"Even Kaiteriteri at 19°C is cold for a long swim, and the dolphin swim wetsuits go on over swimwear. Download offline maps for the West Coast before you leave — coverage drops out through the Buller Gorge and over Arthur's Pass.",
+      tags:[["t-open","Pack list"]], meta:"A tide chart app is worth having for timing Punakaiki.", links:[] }
+  ]
+}
+];
+
+/* ---------- render ---------- */
+const list = document.getElementById('list');
+let ALL = [];
+
+GROUPS.forEach(g=>{
+  const h=document.createElement('h2');
+  h.innerHTML='<span>'+g.title+'</span><span class="when">'+g.when+'</span>';
+  list.appendChild(h);
+  const l=document.createElement('p'); l.className='lede'; l.textContent=g.lede; list.appendChild(l);
+
+  g.items.forEach(it=>{
+    ALL.push(it);
+    const wrap=document.createElement('div');
+    wrap.className='item'; wrap.id='item-'+it.id;
+    const tags = it.tags.map(t=>'<span class="tag '+t[0]+'">'+t[1]+'</span>').join('');
+    const links = it.links.length
+      ? '<p class="links">'+it.links.map(l=>'<a href="'+l[1]+'" target="_blank" rel="noopener">'+l[0]+' ↗</a>').join('')+'</p>'
+      : '';
+    wrap.innerHTML =
+      '<div class="head">'+
+        '<input class="tick" type="checkbox" id="tick-'+it.id+'" aria-label="Mark '+it.title+' as done">'+
+        '<div><h3>'+it.title+'</h3><p>'+it.desc+'</p><p class="meta">'+tags+'<br>'+it.meta+'</p>'+links+'</div>'+
+        '<div class="cost">'+it.cost+'<small>'+it.costNote+'</small></div>'+
+      '</div>'+
+      '<div class="notes"><label for="note-'+it.id+'">Notes — confirmation number, who you spoke to, what they said</label>'+
+      '<textarea id="note-'+it.id+'" placeholder="e.g. Booked 04/09/26, ref BC-88214, spoke to Marnie. 9:30am sailing, arrive 9:00."></textarea></div>';
+    list.appendChild(wrap);
+  });
+});
+
+/* ---------- state ---------- */
+let storageOK = true;
+function load(){
+  try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }
+  catch(e){ storageOK=false; return {}; }
+}
+function save(state){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); flash(); }
+  catch(e){ storageOK=false; document.getElementById('storeWarn').hidden=false; }
+}
+try{
+  const t='__t'; localStorage.setItem(t,'1'); localStorage.removeItem(t);
+}catch(e){ storageOK=false; document.getElementById('storeWarn').hidden=false; }
+
+const state = load();
+if(!storageOK) document.getElementById('storeWarn').hidden=false;
+
+function current(){
+  const s={};
+  ALL.forEach(it=>{
+    s[it.id]={
+      done: document.getElementById('tick-'+it.id).checked,
+      note: document.getElementById('note-'+it.id).value
+    };
+  });
+  return s;
+}
+
+let flashTimer;
+function flash(){
+  const m=document.getElementById('savedMsg');
+  m.textContent='Saved';
+  clearTimeout(flashTimer);
+  flashTimer=setTimeout(()=>{m.textContent='';},1600);
+}
+
+function refresh(){
+  let n=0, cost=0;
+  ALL.forEach(it=>{
+    const tick=document.getElementById('tick-'+it.id);
+    const ta=document.getElementById('note-'+it.id);
+    document.getElementById('item-'+it.id).classList.toggle('done',tick.checked);
+    ta.classList.toggle('has', ta.value.trim().length>0);
+    if(tick.checked){ n++; cost+=it.costVal; }
+  });
+  document.getElementById('pCount').innerHTML = n+' <small>of '+ALL.length+'</small>';
+  document.getElementById('pCost').innerHTML = '$'+cost.toLocaleString('en-NZ')+' <small>of ~$2,110</small>';
+  document.getElementById('pFill').style.width = (n/ALL.length*100)+'%';
+}
+
+ALL.forEach(it=>{
+  const tick=document.getElementById('tick-'+it.id);
+  const ta=document.getElementById('note-'+it.id);
+  if(state[it.id]){ tick.checked=!!state[it.id].done; ta.value=state[it.id].note||''; }
+  tick.addEventListener('change',()=>{ refresh(); save(current()); });
+  let t;
+  ta.addEventListener('input',()=>{ refresh(); clearTimeout(t); t=setTimeout(()=>save(current()),600); });
+});
+refresh();
+
+/* ---------- export ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+document.getElementById('export').addEventListener('click',()=>{
+  const s=current();
+  const stamp=new Date().toLocaleDateString('en-NZ',{day:'2-digit',month:'2-digit',year:'numeric'});
+  let done=0, cost=0;
+  ALL.forEach(it=>{ if(s[it.id].done){done++;cost+=it.costVal;} });
+
+  let rows='';
+  GROUPS.forEach(g=>{
+    rows+='<h2>'+esc(g.title)+' <span>'+esc(g.when)+'</span></h2>';
+    g.items.forEach(it=>{
+      const st=s[it.id];
+      rows+='<div class="row'+(st.done?' done':'')+'">'+
+        '<div class="mark">'+(st.done?'✓':'○')+'</div>'+
+        '<div><h3>'+esc(it.title)+'</h3>'+
+        '<p class="d">'+esc(it.desc)+'</p>'+
+        '<p class="m">'+esc(it.meta)+'</p>'+
+        (it.links.length?'<p class="l">'+it.links.map(l=>'<a href="'+esc(l[1])+'">'+esc(l[0])+'</a>').join(' · ')+'</p>':'')+
+        (st.note.trim()?'<div class="n"><span>Your notes</span>'+esc(st.note).replace(/\n/g,'<br>')+'</div>':'')+
+        '</div><div class="c">'+esc(it.cost)+'</div></div>';
+    });
+  });
+
+  const doc='<!DOCTYPE html><html lang="en-NZ"><head><meta charset="utf-8">'+
+  '<meta name="viewport" content="width=device-width, initial-scale=1">'+
+  '<title>Booking report — Top of the South, January 2027</title><style>'+
+  ':root{--paper:#EDEFE8;--paper-2:#F7F8F3;--ink:#1B2420;--ink-soft:#4E5B54;--ink-faint:#7B877F;--bush:#2E5A3C;--water:#14607C;--water-pale:#D3E3EA;--contour:#A9683A;--rule:#C6CBBD}'+
+  'body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}'+
+  '.s{max-width:880px;margin:0 auto;padding:52px 24px 80px}'+
+  '.e{font:12px "Arial Narrow",Helvetica,sans-serif;text-transform:uppercase;letter-spacing:.22em;color:var(--contour);margin:0 0 12px}'+
+  'h1{font:700 clamp(34px,6vw,54px)/.96 "Arial Narrow",Helvetica,sans-serif;text-transform:uppercase;margin:0 0 10px}'+
+  'h1 span{color:var(--water)}'+
+  '.sum{background:var(--paper-2);border:1px solid var(--rule);padding:16px 18px;margin:22px 0 34px;font-size:15px;color:var(--ink-soft)}'+
+  '.sum b{font:700 24px "Arial Narrow",Helvetica,sans-serif;color:var(--ink)}'+
+  'h2{font:700 13px "Arial Narrow",Helvetica,sans-serif;text-transform:uppercase;letter-spacing:.16em;color:var(--bush);margin:46px 0 14px;padding-bottom:9px;border-bottom:1.5px solid var(--bush);display:flex;justify-content:space-between}'+
+  'h2 span{color:var(--contour);font-weight:400;letter-spacing:.1em}'+
+  '.row{display:grid;grid-template-columns:26px 1fr 100px;gap:14px;padding:16px 0;border-bottom:1px solid var(--rule)}'+
+  '.row.done h3{text-decoration:line-through;opacity:.55}'+
+  '.mark{font:18px "Arial Narrow",Helvetica,sans-serif;color:var(--bush);text-align:center}'+
+  'h3{font:700 19px "Arial Narrow",Helvetica,sans-serif;margin:0 0 5px;letter-spacing:.01em}'+
+  '.d{margin:0 0 7px;font-size:14.5px;color:var(--ink-soft)}'+
+  '.m{margin:0;font-size:12.5px;color:var(--ink-faint)}'+
+  '.l{margin:7px 0 0;font-size:12px}.l a{color:var(--water)}'+
+  '.c{font:700 18px "Arial Narrow",Helvetica,sans-serif;text-align:right}'+
+  '.n{margin-top:11px;border-left:3px solid var(--water);background:var(--water-pale);padding:10px 13px;font-size:14.5px;color:var(--water)}'+
+  '.n span{display:block;font:700 10px "Arial Narrow",Helvetica,sans-serif;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px}'+
+  'footer{margin-top:52px;padding-top:18px;border-top:2px solid var(--ink);font-size:13px;color:var(--ink-faint)}'+
+  '@media print{body{background:#fff}.s{padding:0}.row{break-inside:avoid}}'+
+  '</style></head><body><div class="s">'+
+  '<p class="e">Top of the South · 9–23 January 2027</p>'+
+  '<h1>Booking <span>Report</span></h1>'+
+  '<div class="sum"><b>'+done+' of '+ALL.length+'</b> items booked · <b>$'+cost.toLocaleString('en-NZ')+'</b> committed against an estimated $2,110 · exported '+stamp+'</div>'+
+  rows+
+  '<footer><p>Exported from the interactive checklist on '+stamp+'. Prices and lead times were checked against operator listings as at 01/08/2026; several are estimates. Confirm everything directly before paying.</p></footer>'+
+  '</div></body></html>';
+
+  const blob=new Blob([doc],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='booking-report-'+new Date().toISOString().slice(0,10)+'.html';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+});
+
+document.getElementById('print').addEventListener('click',()=>window.print());
+
+document.getElementById('reset').addEventListener('click',()=>{
+  if(!confirm('Clear every tick and every note? This cannot be undone.')) return;
+  ALL.forEach(it=>{
+    document.getElementById('tick-'+it.id).checked=false;
+    document.getElementById('note-'+it.id).value='';
+  });
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  refresh();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top of the South — 9 to 23 January 2027</title>
+<style>
+  :root{
+    --paper:#EDEFE8;
+    --paper-2:#F7F8F3;
+    --ink:#1B2420;
+    --ink-soft:#4E5B54;
+    --ink-faint:#7B877F;
+    --bush:#2E5A3C;
+    --bush-pale:#C7D7C0;
+    --water:#14607C;
+    --water-pale:#D3E3EA;
+    --contour:#A9683A;
+    --rule:#C6CBBD;
+    --amber:#A9761A;
+    --display:"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed",Helvetica,Arial,sans-serif;
+    --body:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.6;
+  }
+  .sheet{max-width:900px;margin:0 auto;padding:0 28px 96px}
+
+  /* ---------- masthead ---------- */
+  .masthead{position:relative;padding:64px 0 32px;overflow:hidden}
+  .contours{position:absolute;inset:0;z-index:0;opacity:.5;pointer-events:none}
+  .masthead > *:not(.contours){position:relative;z-index:1}
+  .eyebrow{
+    font-family:var(--display);font-stretch:condensed;
+    text-transform:uppercase;letter-spacing:.22em;font-size:12px;
+    color:var(--contour);margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--display);font-stretch:condensed;
+    font-size:clamp(44px,9vw,86px);line-height:.94;font-weight:700;
+    letter-spacing:-.005em;margin:0 0 18px;text-transform:uppercase;
+  }
+  h1 .sub{display:block;color:var(--water);font-style:normal}
+  .dek{max-width:38em;font-size:18px;color:var(--ink-soft);margin:0 0 30px}
+  .dek em{color:var(--water);font-style:italic}
+
+  .facts{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:1px;background:var(--rule);border:1px solid var(--rule);
+  }
+  .fact{background:var(--paper-2);padding:14px 16px}
+  .fact dt{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.12em;font-size:10px;color:var(--ink-faint);margin:0 0 4px;
+  }
+  .fact dd{margin:0;font-family:var(--display);font-stretch:condensed;font-size:26px;line-height:1;font-weight:700}
+  .fact dd span{font-size:13px;font-weight:400;color:var(--ink-soft);letter-spacing:.04em}
+
+  /* ---------- section ---------- */
+  section{margin-top:64px}
+  h2{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.16em;font-size:13px;font-weight:700;color:var(--bush);
+    margin:0 0 20px;padding-bottom:9px;border-bottom:1.5px solid var(--bush);
+  }
+  h3{font-family:var(--display);font-stretch:condensed;font-size:22px;letter-spacing:.01em;margin:0 0 8px}
+  p{margin:0 0 14px}
+
+  /* ---------- water key ---------- */
+  .key{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .key div{background:var(--paper-2);padding:14px 16px}
+  .key strong{
+    display:block;font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.1em;font-size:11px;margin-bottom:5px;
+  }
+  .key p{font-size:14px;color:var(--ink-soft);margin:0}
+  .k-swim strong{color:var(--water)}
+  .k-part strong{color:var(--amber)}
+  .k-none strong{color:var(--ink-faint)}
+
+  /* ---------- itinerary ---------- */
+  .stop{display:grid;grid-template-columns:88px 1fr;gap:22px;margin-bottom:8px}
+  @media(max-width:640px){.stop{grid-template-columns:1fr;gap:6px}}
+
+  .marker{padding-top:6px}
+  .marker .num{
+    font-family:var(--display);font-stretch:condensed;font-size:44px;line-height:.9;
+    font-weight:700;color:var(--bush-pale);display:block;
+  }
+  .marker .nights{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.12em;font-size:10px;color:var(--ink-faint);
+  }
+
+  .card{border-top:2px solid var(--ink);padding:14px 0 26px}
+  .dates{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.14em;font-size:11px;color:var(--contour);margin-bottom:6px;
+  }
+  .park{font-size:14px;color:var(--ink-soft);margin:0 0 14px}
+
+  /* the signature: topo-style water annotation */
+  .water{
+    border-left:3px solid var(--water);background:var(--water-pale);
+    padding:11px 14px;margin:0 0 16px;
+  }
+  .water .label{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.14em;font-size:10px;color:var(--water);display:block;margin-bottom:3px;
+  }
+  .water p{font-style:italic;color:var(--water);margin:0;font-size:15px;line-height:1.5}
+  .water.dry{border-left-color:var(--ink-faint);background:#E4E7DF}
+  .water.dry .label,.water.dry p{color:var(--ink-soft)}
+
+  .do{margin:0 0 14px;padding:0;list-style:none}
+  .do li{padding:7px 0 7px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:64px 1fr;gap:14px}
+  .do li:last-child{border-bottom:none}
+  .do .day{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.1em;font-size:11px;color:var(--ink-faint);padding-top:4px;
+  }
+  @media(max-width:520px){.do li{grid-template-columns:1fr;gap:2px}}
+
+  .note{font-size:14px;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:10px}
+  .note b{font-family:var(--display);font-stretch:condensed;text-transform:uppercase;letter-spacing:.1em;font-size:10px;color:var(--contour);font-weight:700}
+
+  /* drive leg connector */
+  .leg{
+    display:grid;grid-template-columns:88px 1fr;gap:22px;margin:0 0 8px;
+  }
+  @media(max-width:640px){.leg{grid-template-columns:1fr;gap:0}}
+  .leg .rail{position:relative}
+  .leg .rail::before{
+    content:"";position:absolute;left:43px;top:-8px;bottom:-8px;
+    border-left:2px dashed var(--contour);
+  }
+  @media(max-width:640px){.leg .rail{display:none}}
+  .leg .detail{
+    font-family:var(--display);font-stretch:condensed;font-size:13px;
+    letter-spacing:.06em;color:var(--contour);padding:14px 0;
+    text-transform:uppercase;
+  }
+  .leg .detail em{font-family:var(--body);font-style:italic;text-transform:none;letter-spacing:0;color:var(--ink-soft);font-size:14px;display:block;margin-top:4px}
+
+  /* ---------- tables ---------- */
+  table{width:100%;border-collapse:collapse;font-size:15px;margin:0 0 18px}
+  th{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.12em;font-size:10px;color:var(--ink-faint);text-align:left;
+    padding:0 12px 7px 0;border-bottom:1.5px solid var(--ink);font-weight:700;
+  }
+  td{padding:9px 12px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+  td.num{text-align:right;padding-right:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+  th.num{text-align:right;padding-right:0}
+  tr.total td{border-bottom:none;border-top:1.5px solid var(--ink);font-weight:700}
+
+  /* ---------- option cards ---------- */
+  .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .opt{background:var(--paper-2);padding:18px}
+  .opt .status{
+    font-family:var(--display);font-stretch:condensed;text-transform:uppercase;
+    letter-spacing:.14em;font-size:10px;margin-bottom:8px;color:var(--bush);
+  }
+  .opt.check .status{color:var(--amber)}
+  .opt p{font-size:14px;color:var(--ink-soft)}
+  .opt .meta{font-size:13px;color:var(--ink-faint);margin:0}
+  a{color:var(--water);text-decoration:none;border-bottom:1px solid var(--water-pale)}
+  a:hover{border-bottom-color:var(--water)}
+  a:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+
+  footer{margin-top:72px;padding-top:20px;border-top:2px solid var(--ink);font-size:13px;color:var(--ink-faint)}
+
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .sheet{max-width:none;padding:0}
+    .stop,.opt,section{break-inside:avoid}
+    .masthead{padding-top:0}
+    a{color:inherit;border:none}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header class="masthead">
+  <svg class="contours" viewBox="0 0 900 320" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="#A9683A" stroke-width="1" opacity="0.34">
+      <path d="M-20,255 C120,225 220,265 330,235 C440,205 560,240 690,205 C790,178 860,196 920,180"/>
+      <path d="M-20,275 C120,247 225,286 335,257 C445,228 565,262 695,228 C795,201 862,218 920,203"/>
+      <path d="M-20,296 C125,269 230,307 340,279 C450,251 570,284 700,251 C800,225 864,241 920,227"/>
+      <path d="M-20,232 C115,201 215,243 325,212 C435,181 555,217 685,181 C785,153 858,173 920,156"/>
+      <path d="M-20,208 C110,176 208,220 318,188 C428,156 548,193 678,156 C778,127 856,149 920,131"/>
+    </g>
+    <g fill="none" stroke="#14607C" stroke-width="1.4" opacity="0.4">
+      <path d="M-20,120 C90,140 150,96 250,112 C350,128 400,86 520,100 C640,114 700,74 830,90 C880,96 900,92 920,88"/>
+    </g>
+  </svg>
+
+  <p class="eyebrow">Family campervan trip · JUCY Condo · South Island</p>
+  <h1>Top of<br>the South<span class="sub">9–23 Jan 2027</span></h1>
+  <p class="dek">Fourteen nights, six bases, one loop. North to the alpine hot pools, out to the Kaikōura coast, across to the sunniest corner of the country, down the West Coast, back over Arthur's Pass, and finishing in a drowned volcano. <em>Every stop is marked for what you can swim in.</em></p>
+
+  <dl class="facts">
+    <div class="fact"><dt>Nights</dt><dd>14</dd></div>
+    <div class="fact"><dt>Bases</dt><dd>6</dd></div>
+    <div class="fact"><dt>Distance</dt><dd>1,510<span> km</span></dd></div>
+    <div class="fact"><dt>Longest leg</dt><dd>4<span>h</span>45</dd></div>
+    <div class="fact"><dt>Nights with a pool</dt><dd>8</dd></div>
+  </dl>
+</header>
+
+<section>
+  <h2>How to read the water marks</h2>
+  <div class="key">
+    <div class="k-swim"><strong>Proper swimming</strong><p>A pool at the park, or a beach that is genuinely safe to swim at. Marked in blue on every stop.</p></div>
+    <div class="k-part"><strong>Limited</strong><p>Hot tub, thermal pool, paddling, or swimming that depends on the day's conditions.</p></div>
+    <div class="k-none"><strong>Look, don't swim</strong><p>Rips, driftwood, cold open coast. Beautiful, but not for an eight-year-old.</p></div>
+  </div>
+  <p style="margin-top:14px;font-size:14px;color:var(--ink-faint)">Sea temperatures are approximate January regional averages and could be 2°C either side. None of these beaches are patrolled — treat every swim as unsupervised and judge conditions on the day.</p>
+</section>
+
+<section>
+  <h2>The route, night by night</h2>
+
+  <div class="leg">
+    <div class="rail"></div>
+    <div class="detail">Christchurch Airport → Hanmer Springs · 135 km · 1h45
+      <em>Van collected 2pm. Straight up SH1 then inland at Waipara.</em></div>
+  </div>
+
+  <article class="stop">
+    <div class="marker"><span class="num">01</span><span class="nights">2 nights</span></div>
+    <div class="card">
+      <p class="dates">Sat 9 – Sun 10 January</p>
+      <h3>Hanmer Springs</h3>
+      <p class="park">Hanmer Springs TOP 10 Holiday Park · 5 Hanmer Springs Road</p>
+
+      <div class="water">
+        <span class="label">Water here</span>
+        <p>No pool at the park, but private wood-fired hot tubs at about $39 an hour. The Thermal Pools are a 400 m walk: hot pools at varying temperatures, waterslides, a lazy river and a kids' play area. Outside food is allowed in.</p>
+      </div>
+
+      <ul class="do">
+        <li><span class="day">Sat 9</span><span>Collect the van at 2pm, drive up, settle in. Book a hot tub for the first evening — it's the cheapest good thing on the whole trip.</span></li>
+        <li><span class="day">Sun 10</span><span>Thermal Pools for the morning, before the queues build. Afternoon: A-Maze-N-Golf and the maze are next door, the Animal Park is a five-minute walk, and the Dog Stream Waterfall track runs from the forest behind the park.</span></li>
+        <li><span class="day">Optional</span><span>Jet boating and bungy at Ferry Bridge with Thrillseekers, 10 minutes back down the valley.</span></li>
+      </ul>
+
+      <p class="note"><b>On site</b> &nbsp;Jumping pillow, trampoline, playground, pedal karts and mountain bike hire. The park is walkable to the village, so leave the van parked for two days.</p>
+    </div>
+  </article>
+
+  <div class="leg">
+    <div class="rail"></div>
+    <div class="detail">Hanmer Springs → Kaikōura · 130 km · 1h45
+      <em>Take the Inland Road via Waiau, not back down to SH1. Same time, better scenery, no coastal roadworks.</em></div>
+  </div>
+
+  <article class="stop">
+    <div class="marker"><span class="num">02</span><span class="nights">2 nights</span></div>
+    <div class="card">
+      <p class="dates">Mon 11 – Tue 12 January</p>
+      <h3>Kaikōura</h3>
+      <p class="park">Kaikōura TOP 10 Holiday Park · Beach Road, Kaikōura</p>
+
+      <div class="water">
+        <span class="label">Water here</span>
+        <p>Swimming pool at the park — this is where you swim. The local beaches are gravel and exposed, and the sea sits near 15°C. Short walk to the Whale Watch departure point.</p>
+      </div>
+
+      <ul class="do">
+        <li><span class="day">Mon 11</span><span>Point Kean seal colony at the end of the peninsula. Free, and in January there are pups in the shallow rock pools. Follow with the Kaikōura Peninsula Walkway along the clifftop, and crayfish or fish and chips in town.</span></li>
+        <li><span class="day">Tue 12</span><span><strong>Whale Watch, 7:15am check-in.</strong> Roughly 3.5 hours by catamaran. Take the earliest sailing — calmest seas, and the 10:00am and 12:45pm sailings remain as fallbacks if yours is cancelled for weather.</span></li>
+        <li><span class="day">Tue 12</span><span>Afternoon at the pool, or the Fyffe House colonial cottage in town if energy is low.</span></li>
+      </ul>
+
+      <p class="note"><b>Watch for</b> &nbsp;Seasickness — medicate one to two hours before departure, not once symptoms start. Sandflies at Point Kean. Stay 20 metres from seals and never put yourself between a seal and the water.</p>
+    </div>
+  </article>
+
+  <div class="leg">
+    <div class="rail"></div>
+    <div class="detail">Kaikōura → Motueka · 370 km · 4h45 · longest leg
+      <em>Break it at Pelorus Bridge around midday for lunch and a river swim. The car park fills by 10:30 on a hot day, so a late arrival is fine.</em></div>
+  </div>
+
+  <article class="stop">
+    <div class="marker"><span class="num">03</span><span class="nights">3 nights</span></div>
+    <div class="card">
+      <p class="dates">Wed 13 – Fri 15 January</p>
+      <h3>Motueka</h3>
+      <p class="park">Motueka TOP 10 Holiday Park · Motueka</p>
+
+      <div class="water">
+        <span class="label">Water here — the best of the trip</span>
+        <p>Pool at the park, plus a private spa included free with TOP 10 membership. Kaiteriteri is 20 minutes away: golden sand, calm water, a tidal lagoon, and a sea temperature near 19°C. This is the warmest, safest swimming you'll find on the whole loop.</p>
+      </div>
+
+      <ul class="do">
+        <li><span class="day">Wed 13</span><span>Arrive late afternoon after the long drive. Pool, then the free loaner bikes around Motueka.</span></li>
+        <li><span class="day">Thu 14</span><span><strong>Abel Tasman water taxi.</strong> Wilsons, departing Kaiteriteri 10:30 and returning 4:15, to Anchorage Beach — 45 minutes each way. Five and a half hours of golden sand, plus the optional Pitt Head loop to Te Pukatea if she's got the legs.</span></li>
+        <li><span class="day">Fri 15</span><span>Winery lunch in Upper Moutere (three options overleaf, decision open). Afternoon at Kaiteriteri or back at the camp pool.</span></li>
+      </ul>
+
+      <p class="note"><b>Watch for</b> &nbsp;The Kaiteriteri car park is full by 10am in January. Go early or park at Little Kaiteriteri and walk around. Split Apple Rock is a short walk from Towers Bay if you're not taking the boat.</p>
+    </div>
+  </article>
+
+  <div class="leg">
+    <div class="rail"></div>
+    <div class="detail">Motueka → Carters Beach · 245 km · 3h15
+      <em>Over the Hope Saddle and down the Buller Gorge. Stop at the swingbridge — longest in New Zealand — and the Comet Line zipline if she wants it.</em></div>
+  </div>
+
+  <article class="stop">
+    <div class="marker"><span class="num">04</span><span class="nights">2 nights</span></div>
+    <div class="card">
+      <p class="dates">Sat 16 – Sun 17 January</p>
+      <h3>Carters Beach, Westport</h3>
+      <p class="park">Carters Beach TOP 10 Holiday Park · 57 Marine Parade</p>
+
+      <div class="water">
+        <span class="label">Water here</span>
+        <p>No pool, but a safe sandy swimming beach 100 metres from the front gate — the only genuinely swimmable West Coast beach on your route. Hot tubs for hire on site. Sea around 16°C, so a rashie helps.</p>
+      </div>
+
+      <ul class="do">
+        <li><span class="day">Sat 16</span><span>Arrive mid-afternoon. Beach, jumping pillow, and the games room with air hockey and foosball.</span></li>
+        <li><span class="day">Sun 17</span><span>Cape Foulwind seal colony, 15 minutes away and free. Walk the clifftop track through to Tauranga Bay and back — about 90 minutes with stops. Afternoon back at the beach.</span></li>
+        <li><span class="day">Optional</span><span>The Kawatiri Coastal Trail starts outside the gate. Denniston Incline is 30 minutes north for the mining history if the weather turns.</span></li>
+      </ul>
+
+      <p class="note"><b>Ask at booking</b> &nbsp;Request a hardstanding site — the grass turns to mud in West Coast rain. Reception closes at 7pm in summer. Sandfly repellent goes on before you open the van door.</p>
+    </div>
+  </article>
+
+  <div class="leg">
+    <div class="rail"></div>
+    <div class="detail">Carters Beach → Greymouth · 100 km · 1h30
+      <em>The Great Coast Road. Only 90 minutes of driving, so the day belongs to Punakaiki and Shantytown.</em></div>
+  </div>
+
+  <article class="stop">
+    <div class="marker"><span class="num">05</span><span class="nights">2 nights</span></div>
+    <div class="card">
+      <p class="dates">Mon 18 – Tue 19 January</p>
+      <h3>Greymouth</h3>
+      <p class="park">Greymouth Seaside TOP 10 Holiday Park · Karoro, Greymouth</p>
+
+      <div class="water dry">
+        <span class="label">Water here — the one dry stop</span>
+        <p>No pool, and the beach is not swimmable: rips and driftwood. There is a private spa pool for hire on site. The Grey District Aquatic Centre is about ten minutes away and covers the gap if you need a swim day.</p>
+      </div>
+
+      <ul class="do">
+        <li><span class="day">Mon 18</span><span>Pancake Rocks at Punakaiki on the way through — a 20-minute loop walk. Time your arrival near high tide or you get rocks without the blowholes. Parking is free for 20 minutes, then $5 an hour.</span></li>
+        <li><span class="day">Mon 18</span><span><strong>Shantytown Heritage Park</strong>, open 10am to 3pm. Working steam train, sawmill, sluice gun and gold panning at roughly $7–10 a pan. The best-fitting activity on the entire route: trains, machines and making things in one place. Build the visit around the train departure times.</span></li>
+        <li><span class="day">Tue 19</span><span>Hokitika Gorge — 2.4 km easy loop with two swing bridges. The turquoise only shows after dry weather. Then a pounamu or bone carving session in Hokitika, and the glow worm dell in town at dusk, which is free.</span></li>
+      </ul>
+
+      <p class="note"><b>On site</b> &nbsp;Mini golf, go-karts, playground and a games room. Sandflies are bad at the gorge — repellent on before you leave the van.</p>
+    </div>
+  </article>
+
+  <div class="leg">
+    <div class="rail"></div>
+    <div class="detail">Greymouth → Akaroa · 330 km · 4h45
+      <em>Over Arthur's Pass and across the Canterbury Plains, then the Summit Road into the crater. Lunch at Arthur's Pass village and the Devils Punchbowl Falls walk if legs allow.</em></div>
+  </div>
+
+  <article class="stop">
+    <div class="marker"><span class="num">06</span><span class="nights">3 nights</span></div>
+    <div class="card">
+      <p class="dates">Wed 20 – Fri 22 January</p>
+      <h3>Akaroa</h3>
+      <p class="park">Akaroa TOP 10 Holiday Park · Akaroa</p>
+
+      <div class="water">
+        <span class="label">Water here</span>
+        <p>Decent-sized pool at the park. The main beach in Akaroa is sheltered harbour water and safe for swimming, at around 18°C. Ōkains Bay, 35 minutes over the hill, has proper sand and surf if you want a beach day.</p>
+      </div>
+
+      <ul class="do">
+        <li><span class="day">Wed 20</span><span>Arrive late afternoon after the long drive. Settle in, pool, and walk down into town for dinner.</span></li>
+        <li><span class="day">Thu 21</span><span><strong>Black Cat Hector's dolphin swim.</strong> Maximum 12 swimmers, minimum age 8, sheltered harbour, 5mm wetsuits and hot showers afterwards. Follow with the Giant's House mosaic garden — a whole hillside of broken-china sculpture, and the closest thing to an art lesson she'll agree to.</span></li>
+        <li><span class="day">Fri 22</span><span>Deliberately kept clear. If the dolphin swim is cancelled for conditions on Wednesday, this is your second attempt. Otherwise: Ōkains Bay, the harbour cruise, or nothing at all.</span></li>
+      </ul>
+
+      <p class="note"><b>Watch for</b> &nbsp;Kea at Arthur's Pass will strip the rubber seals off the van — don't leave it unattended with food visible. Ask for a hardstanding site at Akaroa for the harbour view. The walking track into town is steep coming back up, so don't over-shop.</p>
+    </div>
+  </article>
+
+  <div class="leg">
+    <div class="rail"></div>
+    <div class="detail">Akaroa → Christchurch Airport · 100 km · 1h45
+      <em>Leave by 07:30. Refuel at Little River or Lincoln, where it's cheaper than Akaroa. Van back by 10am.</em></div>
+  </div>
+
+  <article class="stop">
+    <div class="marker"><span class="num">—</span><span class="nights">Depart</span></div>
+    <div class="card">
+      <p class="dates">Sat 23 January</p>
+      <h3>Home</h3>
+      <p style="margin:0;color:var(--ink-soft)">The Summit Road is not a route to rush, and JUCY will want the van refuelled and reasonably clean. Allow 45 minutes at the depot before the 10am deadline. Flight back to Auckland later that day.</p>
+    </div>
+  </article>
+
+</section>
+
+<section>
+  <h2>Winery lunch, Friday 15 January — your call</h2>
+  <p>All three are in Upper Moutere, 15 to 25 minutes from the Motueka park. Note that <strong>Forsters no longer exists</strong> — the owners sold the restaurant, so any guide recommending it is out of date.</p>
+  <div class="options">
+    <div class="opt">
+      <p class="status">Confirmed trading</p>
+      <h3>Moutere Hills Restaurant &amp; Cellar Door</h3>
+      <p>A sit-down restaurant lunch with the cellar door tasting at the table, on a deck looking over the vines and neighbouring hop gardens. The most polished meal of the three, and the most formal for an eight-year-old. Choose this if the lunch itself is the point.</p>
+      <p class="meta">42 Eggers Road · 03 543 2288 · rated 4.7–4.8<br><a href="https://mouterehillsrestaurantandcellardoor.co.nz/">mouterehillsrestaurantandcellardoor.co.nz</a></p>
+    </div>
+    <div class="opt check">
+      <p class="status">Ring first</p>
+      <h3>Kahurangi Estate</h3>
+      <p>Land or sea platters around $30 in a sheltered, sunny courtyard off the tasting room. Home to the oldest Riesling vines in the South Island. But the regional winegrowers now point visitors to Heaphy Vineyards instead, which suggests the cellar door may have stopped hosting. Heaphy's café does woodfired pizza, which solves a child's lunch instantly.</p>
+      <p class="meta">Upper Moutere · verify by phone before driving out<br><a href="https://www.tastenelsonwines.nz/kahurangi-estate">tastenelsonwines.nz/kahurangi-estate</a></p>
+    </div>
+    <div class="opt">
+      <p class="status">Confirmed trading</p>
+      <h3>Neudorf Vineyards</h3>
+      <p>A shared picnic basket at a booked table in the wine garden. Room to roam, dogs and children explicitly welcome, and the most acclaimed wine of the three — organic, dry-farmed Moutere Chardonnay and Pinot Noir. The pick if you'd rather not spend an hour asking her to sit still.</p>
+      <p class="meta">138 Neudorf Road · 03 543 2643 · tastings ~$15pp<br><a href="https://neudorf.co.nz/pages/visit">neudorf.co.nz/pages/visit</a></p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Where you can swim, at a glance</h2>
+  <table>
+    <thead>
+      <tr><th>Stop</th><th>Pool</th><th>Spa</th><th>Swimmable water</th><th class="num">Sea</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Hanmer Springs</td><td>No</td><td>Yes</td><td>Thermal pools 400 m, with waterslides and lazy river</td><td class="num">—</td></tr>
+      <tr><td>Kaikōura</td><td><strong>Yes</strong></td><td>No</td><td>Pool on site. Beaches gravel and exposed</td><td class="num">~15°C</td></tr>
+      <tr><td>Motueka</td><td><strong>Yes</strong></td><td>Yes, free</td><td><strong>Kaiteriteri, 20 min</strong> — sand, calm, tidal lagoon</td><td class="num">~19°C</td></tr>
+      <tr><td>Carters Beach</td><td>No</td><td>For hire</td><td><strong>Safe swimming beach, 100 m from the gate</strong></td><td class="num">~16°C</td></tr>
+      <tr><td>Greymouth</td><td>No</td><td>For hire</td><td>None. Aquatic Centre 10 min away</td><td class="num">—</td></tr>
+      <tr><td>Akaroa</td><td><strong>Yes</strong></td><td>No</td><td>Pool on site. Sheltered harbour beach. Ōkains Bay 35 min</td><td class="num">~18°C</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>What the activities cost</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Where</th><th class="num">NZD</th></tr></thead>
+    <tbody>
+      <tr><td>Hector's dolphin swim — 2 adults + 1 child</td><td>Akaroa</td><td class="num">720</td></tr>
+      <tr><td>Whale Watch — 2 adults + 1 child</td><td>Kaikōura</td><td class="num">390</td></tr>
+      <tr><td>Abel Tasman water taxi, return to Anchorage</td><td>Kaiteriteri</td><td class="num">300</td></tr>
+      <tr><td>Winery lunch</td><td>Upper Moutere</td><td class="num">180</td></tr>
+      <tr><td>Thermal pools, two visits</td><td>Hanmer Springs</td><td class="num">150</td></tr>
+      <tr><td>Pounamu or bone carving session</td><td>Hokitika</td><td class="num">150</td></tr>
+      <tr><td>Buller Gorge swingbridge and zipline</td><td>Buller</td><td class="num">120</td></tr>
+      <tr><td>Shantytown admission and gold panning</td><td>Rutherglen</td><td class="num">100</td></tr>
+      <tr><td>Free — Punakaiki, Hokitika Gorge, glow worm dell, Cape Foulwind, Point Kean, Arthur's Pass, every beach</td><td>Everywhere</td><td class="num">0</td></tr>
+      <tr class="total"><td>Estimated total</td><td></td><td class="num">2,110</td></tr>
+      <tr><td>Headroom against budget of $3,250</td><td></td><td class="num">1,140</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:14px;color:var(--ink-faint)">Dolphin swim and Whale Watch child fares are published. Water taxi, carving, thermal pool and zipline figures are estimates. About a thousand dollars of slack is right for a fourteen-day trip where weather will force at least one substitution.</p>
+</section>
+
+<section>
+  <h2>Parks, contacts and reception hours</h2>
+  <p>Reception hours vary more than you'd expect, and three of your arrivals are after a long drive. Ring direct rather than using the online form when you want to ask about hardstanding or the pool.</p>
+  <table>
+    <thead><tr><th>Park</th><th>Nights</th><th>Phone</th><th>Reception closes</th><th>Water</th></tr></thead>
+    <tbody>
+      <tr><td>Hanmer Springs TOP 10</td><td>09–10 Jan</td><td>03 315 7113</td><td><strong>6:00pm</strong></td><td>Hot tubs; thermal pools 400 m</td></tr>
+      <tr><td>Kaikōura TOP 10</td><td>11–12 Jan</td><td>03 319 5362</td><td>8:30pm</td><td><strong>Pool</strong></td></tr>
+      <tr><td>Motueka TOP 10</td><td>13–15 Jan</td><td>0800 668 835</td><td>7:00pm</td><td><strong>Pool</strong> + free spa</td></tr>
+      <tr><td>Carters Beach TOP 10</td><td>16–17 Jan</td><td>03 789 8002</td><td>7:00pm</td><td><strong>Swimming beach 100 m</strong></td></tr>
+      <tr><td>Greymouth Seaside TOP 10</td><td>18–19 Jan</td><td>03 768 6618</td><td>7:00pm</td><td>None. Aquatic Centre 10 min</td></tr>
+      <tr><td>Akaroa TOP 10</td><td>20–22 Jan</td><td>03 304 7471</td><td>8:30pm</td><td><strong>Pool</strong> + harbour beach</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:14px;color:var(--ink-faint)">Your 20 January arrival into Akaroa after a 4h45 drive is the only one where a late arrival is comfortable — Akaroa has the latest reception on the route. Hanmer closes earliest at 6pm, but that's a 1h45 drive from a 2pm pickup, so you have room.</p>
+
+  <h2 style="margin-top:56px">Operators worth having to hand</h2>
+  <table>
+    <thead><tr><th>Who</th><th>For</th><th>Phone</th><th>Hours</th></tr></thead>
+    <tbody>
+      <tr><td>Black Cat Cruises</td><td>Dolphin swim, 21 Jan</td><td>03 304 7641</td><td>9:00am – 5:00pm</td></tr>
+      <tr><td>Shantytown Heritage Park</td><td>Steam train, gold panning, 18 Jan</td><td>03 762 6634</td><td><strong>10:00am – 3:00pm</strong></td></tr>
+      <tr><td>Hanmer Springs Thermal Pools</td><td>10 Jan</td><td>0800 442 663</td><td>10:00am – 7:00pm</td></tr>
+      <tr><td>Moutere Hills Restaurant</td><td>Winery lunch option, 15 Jan</td><td>03 543 2288</td><td>Book ahead</td></tr>
+      <tr><td>Neudorf Vineyards</td><td>Winery lunch option, 15 Jan</td><td>03 543 2643</td><td>Book table online</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:14px;color:var(--ink-faint)">Shantytown's 10am to 3pm window is the tightest constraint of the trip, and it falls on the same day as Punakaiki. Start at 10, not later.</p>
+</section>
+
+<footer>
+  <p>Route, drive times and facilities checked against operator listings as at 01/08/2026. Phone numbers and reception hours verified against live listings. Sea temperatures are approximate January averages. Confirm every booking directly — January is peak, and the dolphin swim caps at twelve people.</p>
+</footer>
+
+</div>
+</body>
+</html>
