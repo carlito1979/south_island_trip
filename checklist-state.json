@@ -1,0 +1,58 @@
+{
+  "dolphin": {
+    "done": false,
+    "note": ""
+  },
+  "whale": {
+    "done": false,
+    "note": "between $410 and $765 depending on cabin class. Seems worth booking the more expensive option though."
+  },
+  "taxi": {
+    "done": false,
+    "note": "$160 one way to Anchorage, so $320 total?"
+  },
+  "parks": {
+    "done": true,
+    "note": "All bookings done and paid for (approx $1250 total)"
+  },
+  "winery": {
+    "done": false,
+    "note": "Kahurangi has gone bust. Neudorf option looks unappealing food wise for a child. Moutere Hills is a proper restaurant with a kids menu"
+  },
+  "hottub": {
+    "done": false,
+    "note": ""
+  },
+  "carving": {
+    "done": false,
+    "note": ""
+  },
+  "shanty": {
+    "done": false,
+    "note": ""
+  },
+  "punakaiki": {
+    "done": false,
+    "note": ""
+  },
+  "buller": {
+    "done": false,
+    "note": ""
+  },
+  "free": {
+    "done": false,
+    "note": ""
+  },
+  "sandfly": {
+    "done": false,
+    "note": ""
+  },
+  "seasick": {
+    "done": false,
+    "note": ""
+  },
+  "rashie": {
+    "done": false,
+    "note": ""
+  }
+}
