@@ -36,7 +36,15 @@
   .tools button:focus-visible{outline:2px solid var(--water);outline-offset:2px}
   .tools .warn{border-color:var(--red);color:var(--red)}
   .tools .warn:hover{background:var(--red);color:#fff}
+  .tools .pub{border-color:var(--bush);color:var(--bush)}
+  .tools .pub:hover{background:var(--bush);color:#fff}
   .saved{font-size:12px;color:var(--ink-faint);align-self:center;font-style:italic}
+
+  .sharebar{border-left:3px solid var(--bush);background:#E4EBE1;padding:12px 15px;margin:0 0 24px;font-size:14px;color:#1F3E2A;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .sharebar b{font-family:var(--display);text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+  .sharebar button{font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:10px;padding:7px 12px;background:var(--bush);color:#fff;border:none;cursor:pointer}
+  .sharebar button:hover{background:#234a2f}
+  .sharebar.missing{border-left-color:var(--ink-faint);background:var(--paper-2);color:var(--ink-faint)}
 
   .callout{border-left:3px solid var(--water);background:var(--water-pale);padding:14px 16px;margin:0 0 30px;font-size:15px;color:var(--water);font-style:italic}
   .warnbox{border-left:3px solid var(--amber);background:#F2EBDA;padding:12px 15px;margin:0 0 26px;font-size:14px;color:#6B4E10}
@@ -112,11 +120,14 @@
 </div>
 
 <div class="tools">
+  <button type="button" id="publish" class="pub">Publish shared state ↓</button>
   <button type="button" id="export">Export report with my notes</button>
   <button type="button" id="print">Print</button>
   <button type="button" id="reset" class="warn">Clear everything</button>
   <span class="saved" id="savedMsg"></span>
 </div>
+
+<div class="sharebar" id="shareBar" hidden></div>
 
 <div class="warnbox" id="storeWarn" hidden>Saving to this browser isn't available here, so your ticks and notes won't survive a refresh. Use <strong>Export report with my notes</strong> before you close the tab, or open this file directly from your downloads folder rather than in a preview window.</div>
 
@@ -143,12 +154,14 @@
 
 <footer>
   <p>Companion to the trip plan and route maps. Prices and lead times checked against operator listings as at 01/08/2026 — dolphin swim and Whale Watch child fares, park phone numbers and reception hours are published. The rest are estimates. Confirm everything directly before paying.</p>
+  <p><strong>On shared state:</strong> if <code>checklist-state.json</code> exists in the same folder as this file, everyone who opens the page sees that published version. Ticking boxes or writing notes only changes your own browser until you click <em>Publish shared state</em> and upload the resulting file to the repo — that step needs GitHub login, so visitors can view but not silently overwrite the group's copy.</p>
 </footer>
 
 </div>
 
 <script>
 const KEY = 'bgp-sth-checklist-v1';
+const SHARED_FILE = 'checklist-state.json';
 
 const GROUPS = [
 {
@@ -298,6 +311,48 @@ try{
 const state = load();
 if(!storageOK) document.getElementById('storeWarn').hidden=false;
 
+const hasLocalEdits = Object.keys(state).some(k => state[k].done || (state[k].note||'').trim());
+
+function applyState(s){
+  ALL.forEach(it=>{
+    const rec = s[it.id];
+    document.getElementById('tick-'+it.id).checked = !!(rec && rec.done);
+    document.getElementById('note-'+it.id).value = (rec && rec.note) || '';
+  });
+  refresh();
+}
+
+const shareBar = document.getElementById('shareBar');
+function showBar(kind, html){
+  shareBar.hidden = false;
+  shareBar.className = 'sharebar' + (kind==='missing' ? ' missing' : '');
+  shareBar.innerHTML = html;
+}
+
+fetch(SHARED_FILE, {cache:'no-store'})
+  .then(r => r.ok ? r.json() : null)
+  .then(shared => {
+    if(!shared){
+      showBar('missing', '<span><b>No shared version published yet.</b> You\'re looking at your own local copy. Use <em>Publish shared state</em> once you\'ve booked a few things, then upload the file to your repo.</span>');
+      return;
+    }
+    if(!hasLocalEdits){
+      applyState(shared);
+      window.__sharedSnapshot = JSON.stringify(shared);
+      showBar('loaded', '<span><b>Shared version loaded</b> — this is what\'s currently published to the group.</span>');
+    } else {
+      window.__sharedSnapshot = JSON.stringify(shared);
+      showBar('loaded',
+        '<span><b>A shared version exists</b> and differs from what\'s saved in this browser.</span>'+
+        '<button type="button" id="loadShared">Load shared version</button>');
+      const btn = document.getElementById('loadShared');
+      if(btn) btn.addEventListener('click', ()=>{ applyState(shared); save(current()); shareBar.hidden=true; });
+    }
+  })
+  .catch(()=>{
+    showBar('missing', '<span><b>Could not check for a shared version</b> — this only works once the file is hosted online, not opened directly from disk.</span>');
+  });
+
 function current(){
   const s={};
   ALL.forEach(it=>{
@@ -408,6 +463,17 @@ document.getElementById('export').addEventListener('click',()=>{
 });
 
 document.getElementById('print').addEventListener('click',()=>window.print());
+
+document.getElementById('publish').addEventListener('click',()=>{
+  const s=current();
+  const blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='checklist-state.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+  alert('Downloaded checklist-state.json.\n\nUpload this to your GitHub repo — same folder as index.html — replacing the existing copy if there is one. Everyone who opens the checklist page after that will see this version. Only people with write access to the repo can publish; visitors can only view and tick locally in their own browser.');
+});
 
 document.getElementById('reset').addEventListener('click',()=>{
   if(!confirm('Clear every tick and every note? This cannot be undone.')) return;
